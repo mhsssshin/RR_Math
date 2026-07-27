@@ -21,23 +21,37 @@ const DEFAULT_USER_DATA = {
 
 let userData = { ...DEFAULT_USER_DATA };
 
-// 2. 상점 아이템 데이터베이스 정의
 const SHOP_ITEMS = [
   // 카테고리: costume (모자, 안경, 의상 등)
   { id: 'hat_straw', category: 'costume', sub: 'hat', name: '밀짚 모자 👒', emoji: '👒', price: 20, style: { top: '-5px', left: '20px', width: '60px', height: '40px', transform: 'rotate(-5deg)' } },
   { id: 'hat_wizard', category: 'costume', sub: 'hat', name: '마법사 모자 🧙', emoji: '🧙', price: 50, style: { top: '-25px', left: '15px', width: '70px', height: '60px', transform: 'rotate(-10deg)' } },
   { id: 'hat_crown', category: 'costume', sub: 'hat', name: '황금 왕관 👑', emoji: '👑', price: 70, style: { top: '-15px', left: '22px', width: '56px', height: '40px' } },
+  { id: 'hat_pirate', category: 'costume', sub: 'hat', name: '해적 선장 모자 🏴‍☠️', emoji: '🏴‍☠️', price: 45, style: { top: '-12px', left: '18px', width: '65px', height: '42px', transform: 'rotate(-3deg)' } },
+  { id: 'hat_detective', category: 'costume', sub: 'hat', name: '탐정 모자 🕵️', emoji: '🕵️', price: 60, style: { top: '-10px', left: '20px', width: '60px', height: '40px' } },
   { id: 'glasses_normal', category: 'costume', sub: 'glasses', name: '똘똘이 안경 👓', emoji: '👓', price: 15, style: { top: '22px', left: '22px', width: '56px', height: '24px' } },
   { id: 'glasses_star', category: 'costume', sub: 'glasses', name: '별 선글라스 🕶️', emoji: '🕶️', price: 40, style: { top: '24px', left: '22px', width: '56px', height: '22px', filter: 'hue-rotate(180deg)' } },
+  { id: 'glasses_funny', category: 'costume', sub: 'glasses', name: '코믹 안경 🥸', emoji: '🥸', price: 30, style: { top: '20px', left: '20px', width: '60px', height: '32px' } },
   { id: 'bowtie_red', category: 'costume', sub: 'clothing', name: '나비 넥타이 🎀', emoji: '🎀', price: 10, style: { top: '50px', left: '33px', width: '34px', height: '22px' } },
   { id: 'costume_detective', category: 'costume', sub: 'clothing', name: '탐정 망토 🕵️', emoji: '🧥', price: 80, style: { top: '52px', left: '15px', width: '70px', height: '40px' } },
+  { id: 'costume_cape', category: 'costume', sub: 'clothing', name: '영웅 망토 🦸', emoji: '🦸', price: 75, style: { top: '50px', left: '12px', width: '76px', height: '45px' } },
+  { id: 'costume_scarf', category: 'costume', sub: 'clothing', name: '빨간 목도리 🧣', emoji: '🧣', price: 25, style: { top: '48px', left: '24px', width: '52px', height: '26px' } },
   
   // 카테고리: furniture (배경 벽지 및 가구)
   { id: 'bg_forest', category: 'furniture', sub: 'wallpaper', name: '초록 숲속 벽지 🌳', emoji: '🌳', price: 30, roomClass: 'room-theme-forest', roomBg: '#D5F5E3' },
   { id: 'bg_space', category: 'furniture', sub: 'wallpaper', name: '우주 은하 벽지 🌌', emoji: '🌌', price: 60, roomClass: 'room-theme-space', roomBg: '#D6EAF8' },
+  { id: 'bg_pink', category: 'furniture', sub: 'wallpaper', name: '핑키 캔디 벽지 🍭', emoji: '🍭', price: 35, roomClass: 'room-theme-pink', roomBg: '#FADBD8' },
+  { id: 'bg_ocean', category: 'furniture', sub: 'wallpaper', name: '아쿠아 바다 벽지 🐳', emoji: '🐳', price: 50, roomClass: 'room-theme-ocean', roomBg: '#E8F8F5' },
+  { id: 'bg_yellow', category: 'furniture', sub: 'wallpaper', name: '골드 치즈 벽지 🧀', emoji: '🧀', price: 40, roomClass: 'room-theme-yellow', roomBg: '#FCF3CF' },
   { id: 'toy_bear', category: 'furniture', sub: 'deco', name: '곰인형 친구 🧸', emoji: '🧸', price: 25, posX: '10%', posY: '65%' },
   { id: 'toy_cactus', category: 'furniture', sub: 'deco', name: '귀요미 선인장 🌵', emoji: '🌵', price: 20, posX: '80%', posY: '60%' },
-  { id: 'furniture_window', category: 'furniture', sub: 'deco', name: '동그라미 창문 🖼️', emoji: '🖼️', price: 45, posX: '45%', posY: '15%' }
+  { id: 'furniture_window', category: 'furniture', sub: 'deco', name: '동그라미 창문 🖼️', emoji: '🖼️', price: 45, posX: '45%', posY: '15%' },
+  { id: 'toy_dino', category: 'furniture', sub: 'deco', name: '아기 공룡 인형 🦖', emoji: '🦖', price: 35, posX: '72%', posY: '68%' },
+  { id: 'toy_car', category: 'furniture', sub: 'deco', name: '미니 자동차 토이 🚗', emoji: '🚗', price: 30, posX: '38%', posY: '76%' },
+  { id: 'rug_leaf', category: 'furniture', sub: 'deco', name: '나뭇잎 러그 🍃', emoji: '🍃', price: 15, posX: '20%', posY: '80%' },
+  { id: 'toy_star', category: 'furniture', sub: 'deco', name: '별 무드 조명 🌟', emoji: '🌟', price: 25, posX: '80%', posY: '22%' },
+  { id: 'furniture_bed', category: 'furniture', sub: 'deco', name: '푹신한 침대 🛏️', emoji: '🛏️', price: 90, posX: '5%', posY: '54%' },
+  { id: 'furniture_table', category: 'furniture', sub: 'deco', name: '원목 원형 탁자 🪵', emoji: '🪵', price: 50, posX: '58%', posY: '64%' },
+  { id: 'plant_flower', category: 'furniture', sub: 'deco', name: '작은 꽃 화분 🪴', emoji: '🪴', price: 22, posX: '82%', posY: '46%' }
 ];
 
 // 2.5. 배열 셔플 (질문 보기 랜덤화를 위한 유틸리티)
@@ -1191,6 +1205,19 @@ function renderMyRoom() {
       el.style.left = item.posX;
       el.style.top = item.posY;
       el.textContent = item.emoji;
+      
+      // 방 꾸미기 가구 클릭 상호작용 (점프 애니메이션 및 뿅 효과음)
+      el.onclick = () => {
+        el.classList.add('jump');
+        // 귀여운 뾰로롱 신디사이징음 출력
+        playTone(523, 0.08, 'sine');
+        setTimeout(() => playTone(784, 0.12, 'sine'), 50);
+        
+        setTimeout(() => {
+          el.classList.remove('jump');
+        }, 500);
+      };
+      
       decorLayer.appendChild(el);
     }
   });
