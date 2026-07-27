@@ -12,30 +12,28 @@ const DEFAULT_USER_DATA = {
   xpLevel: 1,             // 레벨
   currentStage: 1,        // 진행 중인 스테이지 번호
   unlockedStages: [1],    // 해금된 스테이지 목록
-  inventory: [],          // 구매 완료 아이템 목록 (아이디 배열)
-  equippedCostume: {},    // 착용 코스튬 { hat: id, glasses: id, clothing: id }
+  inventory: ['skin_base'], // 구매 완료 아이템 목록 (기본 스킨 포함)
+  equippedCostume: { skin: 'skin_base' }, // 장착 캐릭터 스킨 { skin: id }
   equippedFurniture: [],  // 배치 가구 목록 (아이디 배열)
   completedDays: [],      // 출석일 기록
   incorrectAnswers: [],   // 오답 리스트
-  costumeTransforms: {}   // 각 장신구의 커스텀 위치/크기/각도 상태 { itemId: { x, y, scale, rotate } }
+  furnitureTransforms: {} // 각 가구의 커스텀 위치/크기/각도 상태 { itemId: { x, y, scale, rotate } }
 };
 
 let userData = { ...DEFAULT_USER_DATA };
 
 const SHOP_ITEMS = [
-  // 카테고리: costume (모자, 안경, 의상 등)
-  { id: 'hat_straw', category: 'costume', sub: 'hat', name: '밀짚 모자 👒', emoji: '👒', price: 20, style: { svgY: 12, svgSize: 42, transform: 'rotate(-5 50 12)' } },
-  { id: 'hat_wizard', category: 'costume', sub: 'hat', name: '마법사 모자 🧙', emoji: '🧙', price: 50, style: { svgY: 4, svgSize: 52, transform: 'rotate(-10 50 4)' } },
-  { id: 'hat_crown', category: 'costume', sub: 'hat', name: '황금 왕관 👑', emoji: '👑', price: 70, style: { svgY: 10, svgSize: 36 } },
-  { id: 'hat_pirate', category: 'costume', sub: 'hat', name: '해적 선장 모자 🏴‍☠️', emoji: '🏴‍☠️', price: 45, style: { svgY: 8, svgSize: 42, transform: 'rotate(-3 50 8)' } },
-  { id: 'hat_detective', category: 'costume', sub: 'hat', name: '탐정 모자 🕵️', emoji: '🕵️', price: 60, style: { svgY: 11, svgSize: 40 } },
-  { id: 'glasses_normal', category: 'costume', sub: 'glasses', name: '똘똘이 안경 👓', emoji: '👓', price: 15, style: { svgY: 33, svgSize: 32 } },
-  { id: 'glasses_star', category: 'costume', sub: 'glasses', name: '별 선글라스 🕶️', emoji: '🕶️', price: 40, style: { svgY: 33, svgSize: 32, filter: 'hue-rotate(180deg)' } },
-  { id: 'glasses_funny', category: 'costume', sub: 'glasses', name: '코믹 안경 🥸', emoji: '🥸', price: 30, style: { svgY: 32, svgSize: 36 } },
-  { id: 'bowtie_red', category: 'costume', sub: 'clothing', name: '나비 넥타이 🎀', emoji: '🎀', price: 10, style: { svgY: 54, svgSize: 24 } },
-  { id: 'costume_detective', category: 'costume', sub: 'clothing', name: '탐정 망토 🕵️', emoji: '🧥', price: 80, style: { svgY: 58, svgSize: 46 } },
-  { id: 'costume_cape', category: 'costume', sub: 'clothing', name: '영웅 망토 🦸', emoji: '🦸', price: 75, style: { svgY: 56, svgSize: 46 } },
-  { id: 'costume_scarf', category: 'costume', sub: 'clothing', name: '빨간 목도리 🧣', emoji: '🧣', price: 25, style: { svgY: 55, svgSize: 32 } },
+  // 카테고리: costume (로롱이 캐릭터 스킨)
+  { id: 'skin_base', category: 'costume', sub: 'skin', name: '기본형 로롱이 🐿️', emoji: '🐿️', price: 0, style: { svgY: 30, svgSize: 30 } },
+  { id: 'skin_scarf', category: 'costume', sub: 'skin', name: '빨간 목도리 로롱이 🧣', emoji: '🧣', price: 20, style: { svgY: 55, svgSize: 32 } },
+  { id: 'skin_hero', category: 'costume', sub: 'skin', name: '영웅 로롱이 🦸', emoji: '🦸', price: 75, style: { svgY: 56, svgSize: 46 } },
+  { id: 'skin_wizard', category: 'costume', sub: 'skin', name: '마법사 로롱이 🧙', emoji: '🧙', price: 50, style: { svgY: 4, svgSize: 52, transform: 'rotate(-10 50 4)' } },
+  { id: 'skin_pirate', category: 'costume', sub: 'skin', name: '해적 선장 로롱이 🏴‍☠️', emoji: '🏴‍☠️', price: 45, style: { svgY: 8, svgSize: 42, transform: 'rotate(-3 50 8)' } },
+  { id: 'skin_detective', category: 'costume', sub: 'skin', name: '탐정 로롱이 🕵️', emoji: '🕵️', price: 60, style: { svgY: 11, svgSize: 40 } },
+  { id: 'skin_glasses', category: 'costume', sub: 'skin', name: '똘똘이 로롱이 👓', emoji: '👓', price: 15, style: { svgY: 33, svgSize: 32 } },
+  { id: 'skin_sunglasses', category: 'costume', sub: 'skin', name: '별 선글라스 로롱이 🕶️', emoji: '🕶️', price: 40, style: { svgY: 33, svgSize: 32, filter: 'hue-rotate(180deg)' } },
+  { id: 'skin_funny', category: 'costume', sub: 'skin', name: '코믹 로롱이 🥸', emoji: '🥸', price: 30, style: { svgY: 32, svgSize: 36 } },
+  { id: 'skin_bowtie', category: 'costume', sub: 'skin', name: '신사 로롱이 🎀', emoji: '🎀', price: 10, style: { svgY: 54, svgSize: 24 } },
   
   // 카테고리: furniture (배경 벽지 및 가구)
   { id: 'bg_forest', category: 'furniture', sub: 'wallpaper', name: '초록 숲속 벽지 🌳', emoji: '🌳', price: 30, roomClass: 'room-theme-forest', roomBg: '#D5F5E3' },
@@ -159,8 +157,8 @@ function speakText(text) {
 
 // 6. SPA 화면 전환 함수
 function showScreen(screenId) {
-  if (typeof deselectAdjustmentItem === 'function') {
-    deselectAdjustmentItem();
+  if (typeof deselectFurnitureAdjustment === 'function') {
+    deselectFurnitureAdjustment();
   }
   document.querySelectorAll('.screen-section').forEach(s => {
     s.classList.add('hidden');
@@ -191,8 +189,8 @@ function showScreen(screenId) {
     renderShopItems();
     
     // 첫 진입 시 미세조절기 닫고 두 화면 모두 노출
-    if (typeof deselectAdjustmentItem === 'function') {
-      deselectAdjustmentItem();
+    if (typeof deselectFurnitureAdjustment === 'function') {
+      deselectFurnitureAdjustment();
     }
     const roomViewer = document.getElementById('room-viewer-container');
     const roomShop = document.getElementById('room-shop-container');
@@ -220,10 +218,14 @@ function loadUserData() {
   
   // 구버전 로컬 스토리지 호환성 보강 (널포인터 예방 안전망)
   userData = { ...DEFAULT_USER_DATA, ...userData };
-  if (!userData.inventory) userData.inventory = [];
-  if (!userData.equippedCostume) userData.equippedCostume = {};
+  if (!userData.inventory) userData.inventory = ['skin_base'];
+  if (!userData.inventory.includes('skin_base')) {
+    userData.inventory.push('skin_base');
+  }
+  if (!userData.equippedCostume) userData.equippedCostume = { skin: 'skin_base' };
+  if (!userData.equippedCostume.skin) userData.equippedCostume.skin = 'skin_base';
   if (!userData.equippedFurniture) userData.equippedFurniture = [];
-  if (!userData.costumeTransforms) userData.costumeTransforms = {};
+  if (!userData.furnitureTransforms) userData.furnitureTransforms = {};
   
   updateHeaderUI();
   updateCharacterCostumes();
@@ -1224,53 +1226,106 @@ function renderMyRoom() {
       roomBg.classList.add(item.roomClass);
     } 
     else if (item.sub === 'deco') {
+      const transform = getFurnitureTransform(item.id);
+      
       const el = document.createElement('div');
       el.className = 'decor-furniture-item';
-      el.style.left = item.posX;
-      el.style.top = item.posY;
+      el.style.position = 'absolute';
+      el.style.left = `${transform.x}%`;
+      el.style.top = `${transform.y}%`;
+      el.style.transform = `scale(${transform.scale}) rotate(${transform.rotate}deg)`;
+      el.style.transformOrigin = 'center center';
+      el.style.cursor = 'move';
+      el.style.userSelect = 'none';
       el.textContent = item.emoji;
       
-      // 방 꾸미기 가구 클릭 상호작용 (점프 애니메이션 및 뿅 효과음)
-      el.onclick = () => {
-        el.classList.add('jump');
-        // 귀여운 뾰로롱 신디사이징음 출력
+      // 드래그 앤 드롭 바인딩 (인테리어 가구 배치용)
+      const startDrag = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        playClick();
+        selectFurnitureAdjustment(item);
+        
+        const isTouch = e.type === 'touchstart';
+        const startX = isTouch ? e.touches[0].clientX : e.clientX;
+        const startY = isTouch ? e.touches[0].clientY : e.clientY;
+        
+        const initX = transform.x;
+        const initY = transform.y;
+        
+        const rect = roomBg.getBoundingClientRect();
+        
+        const onDrag = (moveEvent) => {
+          const moveX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
+          const moveY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
+          
+          const deltaX = (moveX - startX) * (100 / rect.width);
+          const deltaY = (moveY - startY) * (100 / rect.height);
+          
+          transform.x = Math.max(-20, Math.min(120, initX + deltaX));
+          transform.y = Math.max(-20, Math.min(120, initY + deltaY));
+          
+          el.style.left = `${transform.x}%`;
+          el.style.top = `${transform.y}%`;
+        };
+        
+        const endDrag = () => {
+          document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
+          document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
+          saveUserData();
+          
+          // 약한 가구 탭 애니메이션 (드래그 종료 시)
+          el.classList.add('jump');
+          setTimeout(() => el.classList.remove('jump'), 500);
+        };
+        
+        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
+        document.addEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
+      };
+      
+      el.addEventListener('mousedown', startDrag);
+      el.addEventListener('touchstart', startDrag, { passive: false });
+      
+      // 일반 클릭 상호작용 (선택만 할 경우 효과음)
+      el.onclick = (e) => {
+        e.stopPropagation();
         playTone(523, 0.08, 'sine');
         setTimeout(() => playTone(784, 0.12, 'sine'), 50);
-        
-        setTimeout(() => {
-          el.classList.remove('jump');
-        }, 500);
+        selectFurnitureAdjustment(item);
       };
       
       decorLayer.appendChild(el);
     }
   });
   
-  // 장착 의상 그리기 (전체 화면 동시 업데이트)
+  // 장착 의상(스킨) 그리기 (전체 화면 동시 업데이트)
   updateCharacterCostumes();
 }
 
-// 코스튬 실시간 미세조정 상태 관리 및 유틸리티
-let activeAdjustmentItemId = null;
+// 가구 실시간 미세조정 상태 관리 및 유틸리티
+let activeAdjustingFurnitureId = null;
 
-function getCostumeTransform(itemId) {
-  if (!userData.costumeTransforms) {
-    userData.costumeTransforms = {};
+function getFurnitureTransform(itemId) {
+  if (!userData.furnitureTransforms) {
+    userData.furnitureTransforms = {};
   }
-  if (!userData.costumeTransforms[itemId]) {
+  if (!userData.furnitureTransforms[itemId]) {
     const item = SHOP_ITEMS.find(x => x.id === itemId);
-    userData.costumeTransforms[itemId] = {
-      x: 50,
-      y: item ? (item.style.svgY || 30) : 30,
+    const defaultX = item ? parseFloat(item.posX || '50') : 50;
+    const defaultY = item ? parseFloat(item.posY || '50') : 50;
+    userData.furnitureTransforms[itemId] = {
+      x: defaultX,
+      y: defaultY,
       scale: 1.0,
       rotate: 0
     };
   }
-  return userData.costumeTransforms[itemId];
+  return userData.furnitureTransforms[itemId];
 }
 
-function selectAdjustmentItem(item) {
-  activeAdjustmentItemId = item.id;
+function selectFurnitureAdjustment(item) {
+  activeAdjustingFurnitureId = item.id;
   const panel = document.getElementById('costume-adjuster-panel');
   const targetName = document.getElementById('adjuster-target-name');
   if (panel && targetName) {
@@ -1279,8 +1334,8 @@ function selectAdjustmentItem(item) {
   }
 }
 
-function deselectAdjustmentItem() {
-  activeAdjustmentItemId = null;
+function deselectFurnitureAdjustment() {
+  activeAdjustingFurnitureId = null;
   const panel = document.getElementById('costume-adjuster-panel');
   if (panel) {
     panel.classList.add('hidden');
@@ -1298,92 +1353,27 @@ function updateCharacterCostumes() {
     if (!group) return;
     group.innerHTML = '';
     
-    Object.keys(userData.equippedCostume).forEach(slot => {
-      const itemId = userData.equippedCostume[slot];
-      if (!itemId) return;
-      
-      const item = SHOP_ITEMS.find(x => x.id === itemId);
-      if (!item) return;
-      
-      const transform = getCostumeTransform(item.id);
-      
-      // SVG 텍스트 노드를 만들어 캐릭터 얼굴 좌표계 상에 완벽하게 바인딩
-      const textNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      textNode.setAttribute('x', transform.x.toString());
-      textNode.setAttribute('y', transform.y.toString());
-      
-      // 스케일을 적용한 폰트 크기 계산
-      const baseSize = item.style.svgSize || 30;
-      const scaledSize = baseSize * transform.scale;
-      textNode.setAttribute('font-size', scaledSize.toString());
-      textNode.setAttribute('text-anchor', 'middle');
-      textNode.setAttribute('dominant-baseline', 'central');
-      
-      // 회전 및 스케일 변환 속성 조합
-      let transformStr = `rotate(${transform.rotate} ${transform.x} ${transform.y})`;
-      if (item.style.transform) {
-        transformStr += ` ${item.style.transform}`;
-      }
-      textNode.setAttribute('transform', transformStr);
-      
-      if (item.style.filter) textNode.setAttribute('style', `filter: ${item.style.filter};`);
-      
-      textNode.textContent = item.emoji;
-      
-      // 드래그 앤 드롭 마우스/터치 바인딩 (마이룸 화면의 SVG에서만 작동 가능)
-      if (group === roomGroup) {
-        textNode.setAttribute('pointer-events', 'auto');
-        textNode.style.cursor = 'move';
-        
-        const startDrag = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          playClick();
-          selectAdjustmentItem(item);
-          
-          const isTouch = e.type === 'touchstart';
-          const startX = isTouch ? e.touches[0].clientX : e.clientX;
-          const startY = isTouch ? e.touches[0].clientY : e.clientY;
-          
-          const initX = transform.x;
-          const initY = transform.y;
-          
-          const svgElement = group.ownerSVGElement;
-          const rect = svgElement.getBoundingClientRect();
-          
-          const onDrag = (moveEvent) => {
-            const moveX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
-            const moveY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
-            
-            // 화면 픽셀 변화를 SVG viewBox 100x100 비율 단위로 맵핑
-            const deltaX = (moveX - startX) * (100 / rect.width);
-            const deltaY = (moveY - startY) * (100 / rect.height);
-            
-            transform.x = initX + deltaX;
-            transform.y = initY + deltaY;
-            
-            updateCharacterCostumes();
-          };
-          
-          const endDrag = () => {
-            document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
-            document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
-            saveUserData();
-          };
-          
-          document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
-          document.addEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
-        };
-        
-        textNode.addEventListener('mousedown', startDrag);
-        textNode.addEventListener('touchstart', startDrag, { passive: false });
-      } else {
-        textNode.setAttribute('pointer-events', 'none');
-      }
-      
-      group.appendChild(textNode);
-    });
+    // 장착된 단 하나의 캐릭터 스킨 적용 (구버전 호환성 기본 스킨 처리 포함)
+    const skinId = userData.equippedCostume.skin || 'skin_base';
+    if (skinId === 'skin_base') return;
+    
+    const item = SHOP_ITEMS.find(x => x.id === skinId);
+    if (!item) return;
+    
+    // SVG 텍스트 노드를 만들어 캐릭터 얼굴 좌표계 상에 완벽하게 바인딩
+    const textNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    textNode.setAttribute('x', '50');
+    textNode.setAttribute('y', item.style.svgY || '30');
+    textNode.setAttribute('font-size', item.style.svgSize || '30');
+    textNode.setAttribute('text-anchor', 'middle');
+    textNode.setAttribute('dominant-baseline', 'central');
+    textNode.setAttribute('pointer-events', 'none');
+    
+    if (item.style.transform) textNode.setAttribute('transform', item.style.transform);
+    if (item.style.filter) textNode.setAttribute('style', `filter: ${item.style.filter};`);
+    
+    textNode.textContent = item.emoji;
+    group.appendChild(textNode);
   });
 }
 
@@ -1396,7 +1386,7 @@ function renderShopItems() {
   filtered.forEach(item => {
     const isOwned = userData.inventory.includes(item.id);
     const isEquipped = (item.category === 'costume')
-      ? (userData.equippedCostume[item.sub] === item.id)
+      ? (userData.equippedCostume.skin === item.id)
       : userData.equippedFurniture.includes(item.id);
       
     const card = document.createElement('div');
@@ -1457,8 +1447,8 @@ function buyShopItem(item) {
 function equipItem(item) {
   playClick();
   if (item.category === 'costume') {
-    userData.equippedCostume[item.sub] = item.id;
-    selectAdjustmentItem(item);
+    userData.equippedCostume.skin = item.id;
+    deselectFurnitureAdjustment();
   } else {
     // 벽지의 경우 중복 안됨
     if (item.sub === 'wallpaper') {
@@ -1468,6 +1458,7 @@ function equipItem(item) {
       });
     }
     userData.equippedFurniture.push(item.id);
+    selectFurnitureAdjustment(item);
   }
   
   saveUserData();
@@ -1478,12 +1469,12 @@ function equipItem(item) {
 function unequipItem(item) {
   playClick();
   if (item.category === 'costume') {
-    delete userData.equippedCostume[item.sub];
-    if (activeAdjustmentItemId === item.id) {
-      deselectAdjustmentItem();
-    }
+    userData.equippedCostume.skin = 'skin_base';
   } else {
     userData.equippedFurniture = userData.equippedFurniture.filter(id => id !== item.id);
+    if (activeAdjustingFurnitureId === item.id) {
+      deselectFurnitureAdjustment();
+    }
   }
   
   saveUserData();
@@ -2006,7 +1997,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (tabShop) {
     tabShop.onclick = () => {
       playClick();
-      deselectAdjustmentItem();
+      deselectFurnitureAdjustment();
       tabShop.classList.add('active');
       if (tabMyRoom) tabMyRoom.classList.remove('active');
       
@@ -2035,15 +2026,15 @@ window.addEventListener('DOMContentLoaded', () => {
     showScreen('screen-roadmap');
   };
 
-  // 실시간 코스튬 미세조절기 버튼 이벤트 바인딩
+  // 실시간 가구 미세조절기 버튼 이벤트 바인딩
   const bindAdjusterButton = (btnId, action) => {
     const btn = document.getElementById(btnId);
     if (btn) {
       btn.onclick = () => {
-        if (!activeAdjustmentItemId) return;
-        const transform = getCostumeTransform(activeAdjustmentItemId);
+        if (!activeAdjustingFurnitureId) return;
+        const transform = getFurnitureTransform(activeAdjustingFurnitureId);
         action(transform);
-        updateCharacterCostumes();
+        renderMyRoom();
         saveUserData();
         
         // 버튼 클릭 피드백 틱 효과음
@@ -2052,20 +2043,23 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  bindAdjusterButton('adj-up', (t) => t.y -= 2.5);
-  bindAdjusterButton('adj-down', (t) => t.y += 2.5);
-  bindAdjusterButton('adj-left', (t) => t.x -= 2.5);
-  bindAdjusterButton('adj-right', (t) => t.x += 2.5);
-  bindAdjusterButton('adj-size-up', (t) => t.scale = Math.min(3.0, t.scale + 0.08));
-  bindAdjusterButton('adj-size-down', (t) => t.scale = Math.max(0.3, t.scale - 0.08));
+  bindAdjusterButton('adj-up', (t) => t.y -= 2);
+  bindAdjusterButton('adj-down', (t) => t.y += 2);
+  bindAdjusterButton('adj-left', (t) => t.x -= 2);
+  bindAdjusterButton('adj-right', (t) => t.x += 2);
+  bindAdjusterButton('adj-size-up', (t) => t.scale = Math.min(2.5, t.scale + 0.08));
+  bindAdjusterButton('adj-size-down', (t) => t.scale = Math.max(0.4, t.scale - 0.08));
   bindAdjusterButton('adj-rot-left', (t) => t.rotate = (t.rotate - 15) % 360);
   bindAdjusterButton('adj-rot-right', (t) => t.rotate = (t.rotate + 15) % 360);
   bindAdjusterButton('adj-reset', (t) => {
-    const item = SHOP_ITEMS.find(x => x.id === activeAdjustmentItemId);
-    t.x = 50;
-    t.y = item ? (item.style.svgY || 30) : 30;
+    const item = SHOP_ITEMS.find(x => x.id === activeAdjustingFurnitureId);
+    const defaultX = item ? parseFloat(item.posX || '50') : 50;
+    const defaultY = item ? parseFloat(item.posY || '50') : 50;
+    t.x = defaultX;
+    t.y = defaultY;
     t.scale = 1.0;
     t.rotate = 0;
+    renderMyRoom();
   });
   
   // [오답노트 버튼 바인딩]
