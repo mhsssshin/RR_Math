@@ -297,11 +297,14 @@ const TEST_QUESTION_TEMPLATES = {
   ]
 };
 
+let usedTestQuestionIds = new Set(); // 테스트 문제 중복 방지용
+
 function startLevelTest() {
   testScore = 0;
   testCurrentStep = 0;
   testCurrentDifficulty = 2; // 난이도 2(토끼)부터 시작하여 적응형으로 이동
   testAnswersHistory = [];
+  usedTestQuestionIds = new Set(); // 테스트 시작 시 초기화
   
   loadTestQuestion();
   showScreen('screen-test');
@@ -319,24 +322,48 @@ function loadTestQuestion() {
   document.getElementById('test-progress').style.width = `${(testCurrentStep / 8) * 100}%`;
   document.getElementById('test-progress-text').textContent = `${testCurrentStep} / 8`;
   
-  // 현재 난이도에 맞는 문제 풀에서 랜덤 추출
-  const pool = TEST_QUESTION_TEMPLATES[testCurrentDifficulty];
-  const qData = pool[Math.floor(Math.random() * pool.length)];
+  // 문제 은행에서 현재 난이도에 맞는 문제를 중복 없이 추출
+  const types = ['concept', 'apply', 'think'];
+  const randomType = types[Math.floor(Math.random() * types.length)];
+  
+  const bankPool = QUESTION_BANK[testCurrentDifficulty]?.[randomType];
+  let qData = null;
+  
+  if (bankPool) {
+    const available = bankPool.filter(q => !usedTestQuestionIds.has(q.id));
+    if (available.length > 0) {
+      qData = available[Math.floor(Math.random() * available.length)];
+      usedTestQuestionIds.add(qData.id);
+    }
+  }
+  
+  // 폴백: 문제 은행에서 못 찾으면 기존 TEST_QUESTION_TEMPLATES 사용
+  if (!qData) {
+    const pool = TEST_QUESTION_TEMPLATES[testCurrentDifficulty];
+    const fallback = pool[Math.floor(Math.random() * pool.length)];
+    qData = {
+      questionText: fallback.q,
+      visual: fallback.visual,
+      options: fallback.options,
+      correctAnswer: fallback.ans,
+      hint: fallback.hint
+    };
+  }
   
   // 문항 데이터 복제 및 저장
   const currentTestQuestion = { ...qData };
   
   // 화면 렌더링
-  document.getElementById('test-question-text').textContent = currentTestQuestion.q;
+  document.getElementById('test-question-text').textContent = currentTestQuestion.questionText || currentTestQuestion.q;
   renderVisualArea('test-visual-area', currentTestQuestion.visual);
   
   // TTS 즉시 읽기
-  speakText(currentTestQuestion.q);
+  speakText(currentTestQuestion.questionText || currentTestQuestion.q);
   
   // 오디오 리스너 연결
   document.getElementById('test-tts-btn').onclick = () => {
     playClick();
-    speakText(currentTestQuestion.q);
+    speakText(currentTestQuestion.questionText || currentTestQuestion.q);
   };
   
   // 보기 렌더링
@@ -346,12 +373,14 @@ function loadTestQuestion() {
   // 3개 보기 또는 4개 보기 대응
   optionsDiv.className = `options-grid cols-${currentTestQuestion.options.length}`;
   
+  const correctAns = currentTestQuestion.correctAnswer || currentTestQuestion.ans;
+  
   const shuffledOptions = shuffleArray(currentTestQuestion.options);
   shuffledOptions.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'option-card bounce-hover';
     btn.innerHTML = opt;
-    btn.onclick = () => selectTestAnswer(btn, opt, currentTestQuestion.ans);
+    btn.onclick = () => selectTestAnswer(btn, opt, correctAns);
     optionsDiv.appendChild(btn);
   });
 }
@@ -564,407 +593,39 @@ function renderRoadmap() {
 // 10. 무한 문제 생성기 및 채점 엔진 (Screen 04)
 // 현재 공부중인 스테이지와 문항 번호(1~5)에 따라 문제를 즉시 절차적/수학 난수 생성
 function generateProceduralQuestion(stage, qNum) {
+  // qNum 1~3은 concept, 4는 apply, 5는 think
   let type = 'concept';
   if (qNum === 4) type = 'apply';
   if (qNum === 5) type = 'think';
   
-  let qText = '';
-  let visual = null;
-  let options = [];
-  let answer = '';
-  let hint = '';
+  // 문제 은행에서 중복 없이 추출
+  const bankQuestion = pickQuestionFromBank(stage, type);
   
-  // 스테이지 난이도에 따른 조합 파라미터
-  if (stage === 1) { // 만 4세 코스 초입
-    if (type === 'concept') {
-      const subType = Math.floor(Math.random() * 3);
-      if (subType === 0) {
-        // 과일 세기
-        const randNum = Math.floor(Math.random() * 4) + 2; // 2 ~ 5
-        const fruits = ['🍎', '🍓', '🍌', '🍊', '🍇'];
-        const fruit = fruits[Math.floor(Math.random() * fruits.length)];
-        qText = `${fruit}는 모두 몇 개일까요?`;
-        visual = { type: 'emoji', count: randNum, item: fruit };
-        answer = `${randNum}`;
-        options = [`${randNum - 1}`, `${randNum}`, `${randNum + 1}`];
-        hint = `하나, 둘, 셋 하며 한 번에 하나씩 짚으며 세어 보아요!`;
-      } else if (subType === 1) {
-        // 색상/모양 차이
-        qText = "모양이나 색깔이 혼자 다른 과일은 무엇일까요?";
-        visual = { type: 'emoji_diff', items: ['🍎', '🍎', '🍇', '🍎'] };
-        answer = "🍇";
-        options = ["🍎", "🍇", "🍓"];
-        hint = `빨간 사과들 속에 혼자 보라색인 포도 🍇 가 있어요.`;
-      } else {
-        // 크기 비교
-        qText = "가장 덩치가 크고 커다란 동물은 누구일까요?";
-        visual = { type: 'emoji_sizes', items: [{e:'🐹', s:1.4}, {e:'🐳', s:3.4}, {e:'🐥', s:1.7}] };
-        answer = "🐳";
-        options = ["🐹", "🐳", "🐥"];
-        hint = `화면에서 가장 크고 푸른 고래 🐳 를 골라보세요!`;
-      }
-    } 
-    else if (type === 'apply') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        const randNum = Math.floor(Math.random() * 3) + 2; // 2 ~ 4
-        qText = `다람쥐에게 버섯을 ${randNum}개 나누어 주려고 해요. 버섯 ${randNum}개가 있는 상자를 골라볼까요?`;
-        visual = { type: 'emoji', count: randNum, item: '🍄' };
-        answer = "🍄".repeat(randNum);
-        options = ["🍄".repeat(randNum - 1), "🍄".repeat(randNum), "🍄".repeat(randNum + 1)];
-        hint = `버섯 그림의 개수가 딱 ${randNum}개인 상자를 골라보세요.`;
-      } else {
-        const randNum = Math.floor(Math.random() * 2) + 3; // 3 ~ 4
-        qText = `귀여운 토끼에게 당근을 ${randNum}개 먹이려고 해요. 당근이 ${randNum}개 그려진 카드를 골라주세요!`;
-        visual = { type: 'emoji', count: randNum, item: '🥕' };
-        answer = "🥕".repeat(randNum);
-        options = ["🥕".repeat(randNum - 2), "🥕".repeat(randNum), "🥕".repeat(randNum + 1)];
-        hint = `당근을 하나씩 세어 보아 ${randNum}개가 되는 카드를 고르세요.`;
-      }
-    } 
-    else if (type === 'think') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        // 패턴 규칙 채우기
-        const pItems = Math.random() > 0.5 ? ['🌸', '🌻'] : ['🍎', '🍊'];
-        qText = `어떤 그림이 빈칸 ?에 들어갈까요? [${pItems[0]}, ${pItems[1]}, ${pItems[0]}, ${pItems[1]}, ?]`;
-        visual = { type: 'pattern', items: [pItems[0], pItems[1], pItems[0], pItems[1], '?'] };
-        answer = pItems[0];
-        options = [pItems[0], pItems[1], '🍉'];
-        hint = `그림이 한 번씩 번갈아가며 반복되고 있어요!`;
-      } else {
-        // AAB 패턴
-        qText = `어떤 그림이 빈칸 ?에 들어갈까요? [🍅, 🍅, 🥦, 🍅, 🍅, ?]`;
-        visual = { type: 'pattern', items: ['🍅', '🍅', '🥦', '🍅', '🍅', '?'] };
-        answer = '🥦';
-        options = ['🍅', '🥦', '🌽'];
-        hint = `토마토가 두 번 나오면 브로콜리가 한 번 나오고 있어요!`;
-      }
-    }
-  } 
-  else if (stage === 2) { // 만 4세 코스 심화
-    if (type === 'concept') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        const randNum = Math.floor(Math.random() * 5) + 5; // 5 ~ 9
-        const animals = ['🐰', '🐱', '🐶', '🐼', '🦊'];
-        const animal = animals[Math.floor(Math.random() * animals.length)];
-        qText = `귀여운 ${animal}는 모두 몇 마리일까요?`;
-        visual = { type: 'emoji', count: randNum, item: animal };
-        answer = `${randNum}`;
-        options = [`${randNum - 2}`, `${randNum - 1}`, `${randNum}`];
-        hint = `다섯보다 더 큰 수예요! 하나씩 짚으며 세어 봐요.`;
-      } else {
-        // 사물 많고 적음 비교
-        const a = Math.floor(Math.random() * 3) + 6; // 6~8
-        const b = a - 2;
-        qText = `빨간 상자 🔴와 파란 상자 🔵 중 어느 상자에 별이 더 많이 들어있을까요?`;
-        visual = { type: 'math', formula: `🔴 ${"⭐".repeat(a)}  |  🔵 ${"⭐".repeat(b)}` };
-        answer = "🔴";
-        options = ["🔴", "🔵"];
-        hint = `더 많은 별이 담겨있는 상자의 색깔(🔴)을 골라보세요.`;
-      }
-    } 
-    else if (type === 'apply') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        const total = Math.floor(Math.random() * 4) + 5; // 5~8
-        const eat = Math.floor(Math.random() * 3) + 1; // 1~3
-        const remain = total - eat;
-        qText = `곰돌이가 쿠키 ${total}개를 구웠는데 그중 ${eat}개를 먹었어요. 남은 쿠키는 몇 개일까요?`;
-        visual = { type: 'emoji', count: total, item: '🍪' };
-        answer = `${remain}`;
-        options = [`${remain - 1}`, `${remain}`, `${remain + 1}`];
-        hint = `전체 쿠키 ${total}개 중에서 먹은 ${eat}개만큼 빼 보아요!`;
-      } else {
-        const a = Math.floor(Math.random() * 3) + 4; // 4~6
-        const b = Math.floor(Math.random() * 3) + 2; // 2~4
-        qText = `다람쥐가 도토리를 아침에 ${a}개 주웠고 점심에 ${b}개 더 주웠어요. 모두 몇 개일까요?`;
-        visual = { type: 'math', formula: `${a}개 + ${b}개 = ?` };
-        answer = `${a + b}`;
-        options = [`${a + b - 1}`, `${a + b}`, `${a + b + 2}`];
-        hint = `아침에 주운 개수와 점심에 주운 개수를 합해보세요.`;
-      }
-    } 
-    else if (type === 'think') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        // 3단계 패턴 [A B B A B B]
-        const pItems = ['🥕', '🍅'];
-        qText = `빈칸 ?에 들어갈 알맞은 채소를 맞추어 볼까요? [${pItems[0]}, ${pItems[1]}, ${pItems[1]}, ${pItems[0]}, ${pItems[1]}, ?]`;
-        visual = { type: 'pattern', items: [pItems[0], pItems[1], pItems[1], pItems[0], pItems[1], '?'] };
-        answer = pItems[1];
-        options = [pItems[0], pItems[1], '🍇'];
-        hint = `당근 다음에 토마토가 2개씩 나오고 있어요!`;
-      } else {
-        // 사과 많이 가진 동물 비교
-        qText = `사과 🍎를 가장 많이 가지고 있는 동물 친구는 누구일까요?`;
-        visual = { type: 'math', formula: `🐻 🍎  |  🐰 🍎🍎🍎  |  🐱 🍎🍎` };
-        answer = '🐰';
-        options = ['🐻', '🐰', '🐱'];
-        hint = `동물들이 가진 사과 개수를 비교해보세요. 토끼 🐰가 3개로 가장 많아요.`;
-      }
-    }
-  } 
-  else if (stage === 3) { // 만 5세 코스
-    if (type === 'concept') {
-      const subType = Math.floor(Math.random() * 3);
-      if (subType === 0) { // 모으기
-        const a = Math.floor(Math.random() * 4) + 2; // 2~5
-        const b = Math.floor(Math.random() * 4) + 2; // 2~5
-        qText = `${a}와 ${b}를 모으면 얼마가 될까요?`;
-        visual = { type: 'math', formula: `${a} ⊕ ${b} = ?` };
-        answer = `${a + b}`;
-        options = [`${a + b - 1}`, `${a + b}`, `${a + b + 1}`];
-        hint = `두 숫자를 하나로 보태서 전부 세어 보는 모으기 연산이에요.`;
-      } else if (subType === 1) { // 가르기
-        const total = Math.floor(Math.random() * 5) + 5; // 5~9
-        const a = Math.floor(Math.random() * (total - 2)) + 1; // 1 ~ total-2
-        const b = total - a;
-        qText = `숫자 ${total}을 ${a}와 다른 숫자로 가르기 하려고 해요. ?는 무엇일까요?`;
-        visual = { type: 'math', formula: `${total} ➔ ${a} 와 ?` };
-        answer = `${b}`;
-        options = [`${b - 1}`, `${b}`, `${b + 1}`];
-        hint = `${total}개 중에서 ${a}개를 빼면 나머지 ?는 몇 개가 될지 생각해 보세요.`;
-      } else {
-        // 절반 분수 조각
-        qText = `피자 한 판을 똑같이 둘(2개 조각)로 나눈 절반은 어떻게 생겼을까요?`;
-        visual = { type: 'math', formula: "1/2" };
-        answer = "🍕";
-        options = ["🍕", "🍕🍕", "🎂"];
-        hint = `전체 2개 조각 중에서 내 몫인 1개 조각(반 판)을 골라보세요.`;
-      }
-    } 
-    else if (type === 'apply') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        // 정각 시계 읽기
-        const hour = Math.floor(Math.random() * 8) + 1; // 1~8시
-        qText = `시계가 가리키는 시각은 몇 시일까요?`;
-        visual = { type: 'clock', hour: hour, minute: 0 };
-        answer = `${hour}`;
-        options = [`${hour - 1}`, `${hour}`, `${hour + 1}`];
-        hint = `시계바늘 중 짧은 바늘(검은색)이 가리키는 숫자를 눈여겨보세요!`;
-      } else {
-        // 30분 시계 읽기
-        const hour = Math.floor(Math.random() * 6) + 2; // 2~7시
-        qText = `시계가 가리키는 시각은 몇 시 몇 분일까요?`;
-        visual = { type: 'clock', hour: hour, minute: 30 };
-        answer = `${hour}:30`;
-        options = [`${hour}:30`, `${hour + 1}:30`, `${hour}:00`];
-        hint = `짧은 바늘이 ${hour}와 ${hour+1}의 중간에 있고, 긴 바늘이 6을 가리켜요.`;
-      }
-    } 
-    else if (type === 'think') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        // 10 채우기
-        const a = Math.floor(Math.random() * 3) + 2;
-        const total = 10;
-        const b = total - a;
-        qText = `상자 안에 도토리를 채워 10개를 만들고 싶어요. 이미 도토리가 ${a}개 있다면 몇 개가 더 필요할까요?`;
-        visual = { type: 'math', formula: `${a} + ? = 10` };
-        answer = `${b}`;
-        options = [`${b - 1}`, `${b}`, `${b + 1}`];
-        hint = `${a}에서 몇 개를 더 보태야 가득 찬 10이 될까요? 10에서 빼보아요.`;
-      } else {
-        // 마리수 다리 세기 논리
-        const birds = Math.floor(Math.random() * 2) + 2; // 2~3마리
-        const legs = birds * 2;
-        qText = `새가 ${birds}마리 앉아 있습니다. 새 다리의 수는 모두 몇 개일까요?`;
-        visual = { type: 'emoji', count: birds, item: '🐦' };
-        answer = `${legs}`;
-        options = [`${legs - 2}`, `${legs}`, `${legs + 2}`];
-        hint = `새 한 마리는 다리가 2개씩 있어요!`;
-      }
-    }
-  } 
-  else if (stage === 4) { // 초등 1학년
-    if (type === 'concept') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        const isAdd = Math.random() > 0.5;
-        const a = Math.floor(Math.random() * 15) + 5; // 5~19
-        const b = Math.floor(Math.random() * 8) + 2;  // 2~9
-        if (isAdd) {
-          qText = `덧셈을 계산해 보세요. ${a} + ${b} = ?`;
-          visual = { type: 'math', formula: `${a} + ${b} = ?` };
-          answer = `${a + b}`;
-          options = [`${a + b - 1}`, `${a + b}`, `${a + b + 1}`];
-        } else {
-          const top = a + b;
-          qText = `뺄셈을 계산해 보세요. ${top} - ${b} = ?`;
-          visual = { type: 'math', formula: `${top} - ${b} = ?` };
-          answer = `${a}`;
-          options = [`${a - 2}`, `${a - 1}`, `${a}`];
-        }
-        hint = `일의 자리 숫자부터 차근차근 올림이나 내림을 해 볼까요?`;
-      } else {
-        // 자릿값 매핑
-        const tens = Math.floor(Math.random() * 5) + 3; // 3~7
-        const ones = Math.floor(Math.random() * 7) + 1; // 1~7
-        const target = (tens * 10) + ones;
-        qText = `십의 자리가 ${tens}이고 일의 자리가 ${ones}인 숫자는 무엇일까요?`;
-        visual = { type: 'math', formula: `[십의자리: ${tens}, 일의자리: ${ones}]` };
-        answer = `${target}`;
-        options = [`${target}`, `${ones}${tens}`, `${tens}0${ones}`];
-        hint = `십의 자리는 왼쪽, 일의 자리는 오른쪽에 써서 나란히 놓아보세요.`;
-      }
-    } 
-    else if (type === 'apply') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        const a = Math.floor(Math.random() * 20) + 20; // 20~39
-        const b = Math.floor(Math.random() * 15) + 10; // 10~24
-        qText = `하늘이에겐 초콜릿이 ${a}개 있고, 지석이에겐 ${b}개 있습니다. 누구에게 초콜릿이 더 많이 있을까요?`;
-        visual = { type: 'math', formula: `${a} vs ${b}` };
-        answer = `하늘이 (${a}개)`;
-        options = [`하늘이 (${a}개)`, `지석이 (${b}개)`, `똑같아요`];
-        hint = `두 수의 크기 비교입니다. 십의 자리가 클수록 더 커요.`;
-      } else {
-        // 도토리 물품 구매
-        const a = Math.floor(Math.random() * 10) + 12; // 12~21
-        const b = Math.floor(Math.random() * 5) + 5;   // 5~9
-        qText = `로롱방을 꾸미기 위해 가구 ${a}도토리짜리와 코스튬 ${b}도토리짜리를 샀어요. 모두 몇 도토리가 필요할까요?`;
-        visual = { type: 'math', formula: `${a} + ${b} = ?` };
-        answer = `${a + b}개`;
-        options = [`${a + b - 2}개`, `${a + b}개`, `${a + b + 1}개`];
-        hint = `두 물건의 가격을 서로 더하는 연산을 해주세요.`;
-      }
-    } 
-    else if (type === 'think') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        const a = Math.floor(Math.random() * 5) + 4; // 4~8
-        const b = Math.floor(Math.random() * 5) + 4; // 4~8
-        const sum = a + b;
-        qText = `빈 상자 ? 안에 들어갈 숫자는 무엇일까요? [ ? + ${a} = ${sum} ]`;
-        visual = { type: 'math', formula: `? + ${a} = ${sum}` };
-        answer = `${b}`;
-        options = [`${b - 1}`, `${b}`, `${b + 1}`];
-        hint = `답 ${sum}에서 거꾸로 ${a}를 빼 보면 물음표 상자 안을 알 수 있어요!`;
-      } else {
-        // 부등호 조건식 만족하는 최대 정수
-        const a = Math.floor(Math.random() * 4) + 6; // 6~9
-        const b = a - 4; // 2~5
-        qText = `식 [ ${a} - ? > ${b} ] 가 올바른 식이 되도록 하는 물음표 안의 숫자 중 '가장 큰' 숫자는 무엇일까요?`;
-        visual = { type: 'math', formula: `${a} - ? > ${b}` };
-        // a - x > b  => x < a - b
-        const maxVal = (a - b) - 1;
-        answer = `${maxVal}`;
-        options = [`${maxVal - 1}`, `${maxVal}`, `${maxVal + 1}`];
-        hint = `물음표에 보기를 하나씩 대입해서 계산해 보았을 때, 빼고 남은 수가 ${b}보다 커야 해요.`;
-      }
-    }
-  } 
-  else { // Stage 5 (초등 2~3학년)
-    if (type === 'concept') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        const isMult = Math.random() > 0.5;
-        if (isMult) {
-          const a = Math.floor(Math.random() * 8) + 2; // 2~9
-          const b = Math.floor(Math.random() * 8) + 2; // 2~9
-          qText = `곱셈 계산을 해보세요. ${a} × ${b} 는 얼마일까요?`;
-          visual = { type: 'math', formula: `${a} × ${b} = ?` };
-          answer = `${a * b}`;
-          options = [`${a * b - 3}`, `${a * b}`, `${a * b + 4}`];
-          hint = `${a}를 ${b}번 더하거나 해당 단수 구구단을 외워봐요.`;
-        } else {
-          // 세자리수 연산
-          const a = Math.floor(Math.random() * 300) + 100; // 100~399
-          const b = Math.floor(Math.random() * 200) + 50;  // 50~249
-          const isPlus = Math.random() > 0.5;
-          if (isPlus) {
-            qText = `세 자리 수의 덧셈입니다. ${a} + ${b} = ?`;
-            visual = { type: 'math', formula: `${a} + ${b} = ?` };
-            answer = `${a + b}`;
-            options = [`${a + b - 10}`, `${a + b}`, `${a + b + 10}`];
-          } else {
-            qText = `세 자리 수의 뺄셈입니다. ${a + b} - ${b} = ?`;
-            visual = { type: 'math', formula: `${a + b} - ${b} = ?` };
-            answer = `${a}`;
-            options = [`${a - 5}`, `${a}`, `${a + 5}`];
-          }
-          hint = `일, 십, 백의 자리 순서대로 받아올림/받아내림을 조심해서 계산하세요.`;
-        }
-      } else {
-        // 똑같이 나누어 담기 (나눗셈 기초)
-        const total = [12, 16, 20, 24][Math.floor(Math.random() * 4)];
-        const divisor = 4;
-        const quotient = total / divisor;
-        qText = `귤 ${total}개를 4개의 바구니에 똑같이 나누어 담으려고 합니다. 한 바구니당 몇 개씩 들어가나요?`;
-        visual = { type: 'math', formula: `${total} ÷ 4 = ?` };
-        answer = `${quotient}개`;
-        options = [`${quotient - 1}개`, `${quotient}개`, `${quotient + 1}개`];
-        hint = `4에 곱했을 때 ${total}이 되는 곱셈식(4 × ? = ${total})을 찾아보세요!`;
-      }
-    } 
-    else if (type === 'apply') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        const baseVal = Math.floor(Math.random() * 4) + 3; // 3~6
-        const count = Math.floor(Math.random() * 3) + 3;   // 3~5
-        qText = `사과를 한 상자에 ${baseVal}개씩 담아 포장했습니다. 모두 ${count}상자가 있다면 사과는 전부 몇 개일까요?`;
-        visual = { type: 'math', formula: `${baseVal} × ${count} = ?` };
-        answer = `${baseVal * count}개`;
-        options = [`${baseVal * count - count}개`, `${baseVal * count}개`, `${baseVal * count + count}개`];
-        hint = `${baseVal}을 ${count}번 더하는 것이므로 곱셈 연산식으로 풀 수 있어요!`;
-      } else {
-        // 동전 가치 합산
-        const ones = Math.floor(Math.random() * 4) + 2; // 100원짜리 2~5개
-        const tens = Math.floor(Math.random() * 6) + 3; // 10원짜리 3~8개
-        const sum = (ones * 100) + (tens * 10) + 500; // 500원 1개 고정
-        qText = `지갑 속에 500원 동전 1개, 100원 동전 ${ones}개, 10원 동전 ${tens}개가 들어 있습니다. 모두 얼마일까요?`;
-        visual = { type: 'math', formula: `500원 × 1 + 100원 × ${ones} + 10원 × ${tens}` };
-        answer = `${sum}원`;
-        options = [`${sum - 50}원`, `${sum}원`, `${sum + 90}원`];
-        hint = `500원과 ${ones * 100}원, 그리고 ${tens * 10}원을 하나씩 더해보세요.`;
-      }
-    } 
-    else if (type === 'think') {
-      const subType = Math.floor(Math.random() * 2);
-      if (subType === 0) {
-        const mulVal = Math.floor(Math.random() * 4) + 3; // 3~6
-        const answerNum = Math.floor(Math.random() * 5) + 3; // 3~7
-        const total = mulVal * answerNum;
-        qText = `어떤 수에 ${mulVal}을 곱했더니 ${total}이 되었습니다. '어떤 수'는 무엇일까요?`;
-        visual = { type: 'math', formula: `? × ${mulVal} = ${total}` };
-        answer = `${answerNum}`;
-        options = [`${answerNum - 1}`, `${answerNum}`, `${answerNum + 1}`];
-        hint = `구구단 ${mulVal}단 중에서 곱한 결과가 ${total}이 되는 숫자가 누구인지 생각해 보세요!`;
-      } else {
-        // 수열 규칙 찾기
-        const gap = Math.floor(Math.random() * 2) + 2; // 2~3
-        const isDouble = Math.random() > 0.5;
-        let seq = [];
-        let ansNum = 0;
-        if (isDouble) {
-          seq = [2, 4, 8, 16];
-          ansNum = 32;
-        } else {
-          seq = [3, 3 + gap, 3 + gap*2, 3 + gap*3];
-          ansNum = 3 + gap*4;
-        }
-        qText = `숫자들의 규칙을 찾고 빈칸 ?에 들어갈 알맞은 숫자를 맞추어 보세요. [ ${seq.join(', ')}, ? ]`;
-        visual = { type: 'pattern', items: [...seq, '?'] };
-        answer = `${ansNum}`;
-        options = [`${ansNum - gap}`, `${ansNum}`, `${ansNum + gap * 2}`];
-        hint = `이전 숫자에서 일정한 수를 더하고 있거나, 2배씩 늘어나고 있어요.`;
-      }
-    }
+  if (bankQuestion) {
+    return {
+      id: bankQuestion.id,
+      stage: stage,
+      qNum: qNum,
+      type: type,
+      questionText: bankQuestion.questionText,
+      visual: bankQuestion.visual,
+      options: bankQuestion.options,
+      correctAnswer: bankQuestion.correctAnswer,
+      hint: bankQuestion.hint
+    };
   }
   
+  // 만약 문제 은행이 아직 로드되지 않았을 경우 기본 폴백
   return {
-    id: `q_procedural_${stage}_${qNum}_${Date.now()}`,
+    id: `q_fallback_${stage}_${qNum}_${Date.now()}`,
     stage: stage,
     qNum: qNum,
     type: type,
-    questionText: qText,
-    visual: visual,
-    options: options,
-    correctAnswer: answer,
-    hint: hint
+    questionText: '문제를 불러오는 중이에요...',
+    visual: { type: 'math', formula: '?' },
+    options: ['1', '2', '3'],
+    correctAnswer: '1',
+    hint: '잠시 후 다시 시도해 보세요!'
   };
 }
 
