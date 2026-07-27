@@ -203,6 +203,7 @@ function loadUserData() {
     userData = { ...DEFAULT_USER_DATA };
   }
   updateHeaderUI();
+  updateCharacterCostumes();
 }
 
 function saveUserData() {
@@ -1222,31 +1223,45 @@ function renderMyRoom() {
     }
   });
   
-  // 장착 의상 그리기
-  Object.keys(userData.equippedCostume).forEach(slot => {
-    const itemId = userData.equippedCostume[slot];
-    if (!itemId) return;
+  // 장착 의상 그리기 (전체 화면 동시 업데이트)
+  updateCharacterCostumes();
+}
+
+function updateCharacterCostumes() {
+  const homeLayer = document.getElementById('home-costume-layer');
+  const completedLayer = document.getElementById('completed-costume-layer');
+  const roomLayer = document.getElementById('avatar-costume-layer');
+  
+  const layers = [homeLayer, completedLayer, roomLayer];
+  
+  layers.forEach(layer => {
+    if (!layer) return;
+    layer.innerHTML = '';
     
-    const item = SHOP_ITEMS.find(x => x.id === itemId);
-    if (!item) return;
-    
-    // 이모지 장착 형상 디자인 (절대 좌표 오버레이)
-    const el = document.createElement('div');
-    el.className = 'equipped-costume';
-    el.style.position = 'absolute';
-    el.style.left = item.style.left;
-    el.style.top = item.style.top;
-    el.style.width = item.style.width || 'auto';
-    el.style.height = item.style.height || 'auto';
-    el.style.fontSize = '3.5rem';
-    el.style.textAlign = 'center';
-    el.style.pointerEvents = 'none';
-    
-    if (item.style.transform) el.style.transform = item.style.transform;
-    if (item.style.filter) el.style.filter = item.style.filter;
-    
-    el.textContent = item.emoji;
-    costumeLayer.appendChild(el);
+    Object.keys(userData.equippedCostume).forEach(slot => {
+      const itemId = userData.equippedCostume[slot];
+      if (!itemId) return;
+      
+      const item = SHOP_ITEMS.find(x => x.id === itemId);
+      if (!item) return;
+      
+      const el = document.createElement('div');
+      el.className = 'equipped-costume';
+      el.style.position = 'absolute';
+      el.style.left = item.style.left;
+      el.style.top = item.style.top;
+      el.style.width = item.style.width || 'auto';
+      el.style.height = item.style.height || 'auto';
+      el.style.fontSize = '3.5rem';
+      el.style.textAlign = 'center';
+      el.style.pointerEvents = 'none';
+      
+      if (item.style.transform) el.style.transform = item.style.transform;
+      if (item.style.filter) el.style.filter = item.style.filter;
+      
+      el.textContent = item.emoji;
+      layer.appendChild(el);
+    });
   });
 }
 
@@ -1744,6 +1759,14 @@ window.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => startLevelTest(), 1200);
     }
   };
+
+  const btnGoRoomHome = document.getElementById('btn-go-room-home');
+  if (btnGoRoomHome) {
+    btnGoRoomHome.onclick = () => {
+      playClick();
+      showScreen('screen-room');
+    };
+  }
   
   // [Screen 03] 메인 로드맵 바인딩
   // 스테이지 클릭 시 해당 레벨로 이동

@@ -159,6 +159,22 @@ body {
   padding: 2px;
 }
 
+#app-container.mode-mobile .btn-primary,
+#app-container.mode-mobile .btn-secondary,
+#app-container.mode-mobile .btn-accent,
+#app-container.mode-mobile .btn-large {
+  padding: 12px 18px !important;
+  font-size: 1.1rem !important;
+}
+
+#app-container.mode-mobile .logo-title {
+  font-size: 2.8rem !important;
+}
+
+#app-container.mode-mobile .logo-subtitle {
+  font-size: 1.15rem !important;
+}
+
 #app-container.mode-tablet {
   width: 768px;
   height: 980px;
@@ -226,6 +242,18 @@ body {
   .audio-btn {
     font-size: 1rem;
     padding: 2px;
+  }
+  
+  /* 실제 모바일 화면 단축 버튼/타이틀 크기 조정 */
+  .btn-primary, .btn-secondary, .btn-accent, .btn-large {
+    padding: 12px 18px !important;
+    font-size: 1.1rem !important;
+  }
+  .logo-title {
+    font-size: 2.8rem !important;
+  }
+  .logo-subtitle {
+    font-size: 1.15rem !important;
   }
 }
 
@@ -478,9 +506,10 @@ button {
 .forest-flower {
   position: absolute;
   font-size: 1.5rem;
+  z-index: 0;
 }
-.element-3 { bottom: 15%; left: 12%; transform: rotate(15deg); }
-.element-4 { bottom: 20%; right: 12%; transform: rotate(-15deg); }
+.element-3 { top: 38%; left: 10%; transform: rotate(15deg); }
+.element-4 { top: 44%; right: 10%; transform: rotate(-15deg); }
 
 .main-character-wrapper {
   position: relative;
@@ -493,6 +522,7 @@ button {
 .rorong-char {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 .character-svg {
