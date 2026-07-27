@@ -1933,35 +1933,41 @@ window.addEventListener('DOMContentLoaded', () => {
     scrollContainer.addEventListener('scroll', updateRoadmapCurve);
     window.addEventListener('resize', updateRoadmapCurve);
     
-    // 🖱️ 마우스 드래그 스와이프 기능 활성화
+    // 🖱️ 마우스 및 터치 드래그 스와이프 기능 활성화 (Pointer Events API)
     let isDown = false;
     let startX;
     let scrollLeft;
     
-    scrollContainer.addEventListener('mousedown', (e) => {
+    scrollContainer.addEventListener('pointerdown', (e) => {
       isDown = true;
       scrollContainer.style.cursor = 'grabbing';
       startX = e.clientX;
       scrollLeft = scrollContainer.scrollLeft;
+      try {
+        scrollContainer.setPointerCapture(e.pointerId);
+      } catch (err) {}
     });
     
-    scrollContainer.addEventListener('mouseleave', () => {
-      isDown = false;
-      scrollContainer.style.cursor = 'grab';
-    });
-    
-    scrollContainer.addEventListener('mouseup', () => {
-      isDown = false;
-      scrollContainer.style.cursor = 'grab';
-    });
-    
-    scrollContainer.addEventListener('mousemove', (e) => {
+    scrollContainer.addEventListener('pointermove', (e) => {
       if (!isDown) return;
       e.preventDefault();
       const x = e.clientX;
       const walk = (x - startX) * 1.5; // 스와이프 감도
       scrollContainer.scrollLeft = scrollLeft - walk;
     });
+    
+    const stopDragging = (e) => {
+      if (isDown) {
+        isDown = false;
+        scrollContainer.style.cursor = 'grab';
+        try {
+          scrollContainer.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+      }
+    };
+    
+    scrollContainer.addEventListener('pointerup', stopDragging);
+    scrollContainer.addEventListener('pointercancel', stopDragging);
     
     // 첫 화면 렌더링 시 커브 갱신
     setTimeout(updateRoadmapCurve, 300);
@@ -2035,21 +2041,21 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   
   // [Screen 03] 메인 로드맵 바인딩
-  // 스테이지 클릭 시 해당 레벨로 이동 (드래그 시 클릭 오작동 방지 처리)
+  // 스테이지 클릭 시 해당 레벨로 이동 (드래그 시 클릭 오작동 방지 처리 - Pointer Events API 활용)
   document.querySelectorAll('.island-node').forEach(node => {
     let startClickX = 0;
     let dragDist = 0;
     
-    node.onmousedown = (e) => {
-      startClickX = e.pageX;
+    node.onpointerdown = (e) => {
+      startClickX = e.clientX;
     };
-    node.onmouseup = (e) => {
-      dragDist = Math.abs(e.pageX - startClickX);
+    node.onpointerup = (e) => {
+      dragDist = Math.abs(e.clientX - startClickX);
     };
     
     node.onclick = () => {
       if (dragDist > 8) {
-        // 드래그 스와이프 도중에 마우스 떼는 클릭은 무시
+        // 드래그 스와이프 도중에 마우스/터치 떼는 클릭은 무시
         return;
       }
       const stageNum = parseInt(node.getAttribute('data-stage'));
