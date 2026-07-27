@@ -1942,9 +1942,23 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   
   // [Screen 03] 메인 로드맵 바인딩
-  // 스테이지 클릭 시 해당 레벨로 이동
+  // 스테이지 클릭 시 해당 레벨로 이동 (드래그 시 클릭 오작동 방지 처리)
   document.querySelectorAll('.island-node').forEach(node => {
+    let startClickX = 0;
+    let dragDist = 0;
+    
+    node.onmousedown = (e) => {
+      startClickX = e.pageX;
+    };
+    node.onmouseup = (e) => {
+      dragDist = Math.abs(e.pageX - startClickX);
+    };
+    
     node.onclick = () => {
+      if (dragDist > 8) {
+        // 드래그 스와이프 도중에 마우스 떼는 클릭은 무시
+        return;
+      }
       const stageNum = parseInt(node.getAttribute('data-stage'));
       playClick();
       
@@ -1986,7 +2000,7 @@ window.addEventListener('DOMContentLoaded', () => {
         
         // 중심축 기준 오프셋 계산
         const distance = nodeCenter - containerCenter;
-        const maxDist = containerRect.width / 1.1;
+        const maxDist = containerRect.width / 1.4; // 1.4를 기준으로 더 부드러운 하강 유도
         const ratio = Math.min(Math.max(distance / maxDist, -1), 1);
         
         // 포물선 Y 오프셋 (양쪽 끝으로 갈수록 아래로 내려감)
@@ -1995,12 +2009,48 @@ window.addEventListener('DOMContentLoaded', () => {
         // 자연스럽게 눕도록 하는 기울기(회전)
         const tilt = ratio * 15;
         
+        // 투명도 조절: 중앙에서 멀어질수록 투명해짐 (active-stage인 경우 최소치 상향 보정)
+        const isCurrentlyActive = node.classList.contains('active-stage');
+        const minOpacity = isCurrentlyActive ? 0.75 : 0.5;
+        const opacity = 1 - Math.abs(ratio) * (1 - minOpacity);
+        
         node.style.transform = `translateY(${yOffset}px) rotate(${tilt}deg)`;
+        node.style.opacity = opacity;
       });
     };
     
     scrollContainer.addEventListener('scroll', updateRoadmapCurve);
     window.addEventListener('resize', updateRoadmapCurve);
+    
+    // 🖱️ 마우스 드래그 스와이프 기능 활성화
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    
+    scrollContainer.addEventListener('mousedown', (e) => {
+      isDown = true;
+      scrollContainer.style.cursor = 'grabbing';
+      startX = e.pageX - scrollContainer.offsetLeft;
+      scrollLeft = scrollContainer.scrollLeft;
+    });
+    
+    scrollContainer.addEventListener('mouseleave', () => {
+      isDown = false;
+      scrollContainer.style.cursor = 'grab';
+    });
+    
+    scrollContainer.addEventListener('mouseup', () => {
+      isDown = false;
+      scrollContainer.style.cursor = 'grab';
+    });
+    
+    scrollContainer.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - scrollContainer.offsetLeft;
+      const walk = (x - startX) * 2; // 스와이프 감도
+      scrollContainer.scrollLeft = scrollLeft - walk;
+    });
     
     // 첫 화면 렌더링 시 커브 갱신
     setTimeout(updateRoadmapCurve, 300);

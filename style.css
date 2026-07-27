@@ -850,6 +850,7 @@ button {
   display: flex;
   align-items: flex-start;
   padding-top: 140px; /* 로롱이 아래에서 시작하도록 */
+  cursor: grab;
 }
 
 /* Webkit 브라우저 스크롤바 숨기기 (깔끔한 UI용) */
