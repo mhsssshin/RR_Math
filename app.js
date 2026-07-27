@@ -74,6 +74,9 @@ let testAnswersHistory = [];         // 레벨 테스트 정오답 기록
 let currentActiveLearningStage = 1;  // 선택하여 공부 중인 스테이지 번호
 let confettiInterval = null;         // 폭죽 타이머
 
+let currentPreviewSkin = 'skin_base';
+let currentPreviewFurniture = [];
+
 // 4. Web Audio API 기반 효과음 합성기
 let audioCtx = null;
 function initAudio() {
@@ -185,6 +188,10 @@ function showScreen(screenId) {
   }
 
   if (screenId === 'screen-room') {
+    // 진입 시 실제 장착된 아이템으로 미리보기 초기화!
+    currentPreviewSkin = userData.equippedCostume.skin || 'skin_base';
+    currentPreviewFurniture = [...userData.equippedFurniture];
+    
     renderMyRoom();
     renderShopItems();
     
@@ -1216,8 +1223,8 @@ function renderMyRoom() {
   roomBg.style.backgroundColor = '#FCF3CF';
   roomBg.className = 'myroom-display';
   
-  // 장착 가구/벽지 그리기
-  userData.equippedFurniture.forEach(itemId => {
+  // 장착 가구/벽지 그리기 (미리보기 포함)
+  currentPreviewFurniture.forEach(itemId => {
     const item = SHOP_ITEMS.find(x => x.id === itemId);
     if (!item) return;
     
@@ -1539,11 +1546,12 @@ function updateCharacterCostumes() {
   const completedTarget = document.getElementById('completed-rorong');
   const roomTarget = document.getElementById('room-rorong-character');
   
-  const skinId = userData.equippedCostume.skin || 'skin_base';
+  const equippedSkinId = userData.equippedCostume.skin || 'skin_base';
+  const previewSkinId = currentPreviewSkin || equippedSkinId;
   
-  if (homeTarget) homeTarget.innerHTML = getRorongSVG(skinId, false);
-  if (completedTarget) completedTarget.innerHTML = getRorongSVG(skinId, true);
-  if (roomTarget) roomTarget.innerHTML = getRorongSVG(skinId, false);
+  if (homeTarget) homeTarget.innerHTML = getRorongSVG(equippedSkinId, false);
+  if (completedTarget) completedTarget.innerHTML = getRorongSVG(equippedSkinId, true);
+  if (roomTarget) roomTarget.innerHTML = getRorongSVG(previewSkinId, false);
 }
 
 function renderShopItems() {
@@ -1553,46 +1561,98 @@ function renderShopItems() {
   const filtered = SHOP_ITEMS.filter(x => x.category === currentShopCategory);
   
   filtered.forEach(item => {
+    // 0원인 기본 스킨은 상점 구매대상이 아니므로 노출 건너뛰기
+    if (item.id === 'skin_base') return;
+
     const isOwned = userData.inventory.includes(item.id);
     const isEquipped = (item.category === 'costume')
       ? (userData.equippedCostume.skin === item.id)
       : userData.equippedFurniture.includes(item.id);
       
-    const card = document.createElement('div');
-    card.className = `item-shop-card ${isEquipped ? 'purchased-equipped' : ''}`;
+    // 현재 미리보기에 반영되어 있는지 여부
+    const isPreviewActive = (item.category === 'costume')
+      ? (currentPreviewSkin === item.id)
+      : (currentPreviewFurniture.includes(item.id));
+      
+    const row = document.createElement('div');
+    row.className = `item-shop-row ${isPreviewActive ? 'preview-active' : ''}`;
     
-    card.innerHTML = `
-      <div class="item-shop-card-icon">${item.emoji}</div>
-      <div class="item-shop-card-name">${item.name}</div>
-      <div class="item-shop-card-price">${isOwned ? '소유함' : `🌰 ${item.price}개`}</div>
-      <div class="item-action-area" style="width:100%;"></div>
+    row.innerHTML = `
+      <div class="item-shop-row-left">
+        <span class="item-shop-row-emoji">${item.emoji}</span>
+        <div class="item-shop-row-info">
+          <span class="item-shop-row-name">${item.name}</span>
+          <span class="item-shop-row-price">${isOwned ? '소유함' : `🌰 ${item.price}개`}</span>
+        </div>
+      </div>
+      <div class="item-shop-row-right"></div>
     `;
     
-    const actionArea = card.querySelector('.item-action-area');
+    // 행 클릭 시 즉시 미리보기(Try-on) 반응
+    row.onclick = (e) => {
+      // 만약 버튼을 클릭한 것이라면 버블링 방지
+      if (e.target.tagName === 'BUTTON') return;
+      
+      playClick();
+      
+      if (item.category === 'costume') {
+        currentPreviewSkin = item.id;
+      } else {
+        // 가구/벽지
+        if (item.sub === 'wallpaper') {
+          currentPreviewFurniture = currentPreviewFurniture.filter(id => {
+            const x = SHOP_ITEMS.find(i => i.id === id);
+            return !x || x.sub !== 'wallpaper';
+          });
+          currentPreviewFurniture.push(item.id);
+        } else {
+          // 데코 가구
+          if (!currentPreviewFurniture.includes(item.id)) {
+            currentPreviewFurniture.push(item.id);
+          }
+          // 조절 타겟 지정
+          selectFurnitureAdjustment(item);
+        }
+      }
+      
+      renderMyRoom();
+      renderShopItems();
+    };
+    
+    const rightArea = row.querySelector('.item-shop-row-right');
     
     if (!isOwned) {
       const buyBtn = document.createElement('button');
-      buyBtn.className = 'item-shop-card-btn btn-buy bounce-hover';
-      buyBtn.textContent = '구매하기';
-      buyBtn.onclick = () => buyShopItem(item);
-      actionArea.appendChild(buyBtn);
+      buyBtn.className = 'item-shop-row-btn btn-buy bounce-hover';
+      buyBtn.textContent = '구매';
+      buyBtn.onclick = (e) => {
+        e.stopPropagation();
+        buyShopItem(item);
+      };
+      rightArea.appendChild(buyBtn);
     } else {
       if (isEquipped) {
         const unequipBtn = document.createElement('button');
-        unequipBtn.className = 'item-shop-card-btn btn-unequip bounce-hover';
-        unequipBtn.textContent = '벗기';
-        unequipBtn.onclick = () => unequipItem(item);
-        actionArea.appendChild(unequipBtn);
+        unequipBtn.className = 'item-shop-row-btn btn-unequip bounce-hover';
+        unequipBtn.textContent = '해제';
+        unequipBtn.onclick = (e) => {
+          e.stopPropagation();
+          unequipItem(item);
+        };
+        rightArea.appendChild(unequipBtn);
       } else {
         const equipBtn = document.createElement('button');
-        equipBtn.className = 'item-shop-card-btn btn-equip bounce-hover';
-        equipBtn.textContent = '장착하기';
-        equipBtn.onclick = () => equipItem(item);
-        actionArea.appendChild(equipBtn);
+        equipBtn.className = 'item-shop-row-btn btn-equip bounce-hover';
+        equipBtn.textContent = '장착';
+        equipBtn.onclick = (e) => {
+          e.stopPropagation();
+          equipItem(item);
+        };
+        rightArea.appendChild(equipBtn);
       }
     }
     
-    grid.appendChild(card);
+    grid.appendChild(row);
   });
 }
 
@@ -1617,6 +1677,7 @@ function equipItem(item) {
   playClick();
   if (item.category === 'costume') {
     userData.equippedCostume.skin = item.id;
+    currentPreviewSkin = item.id; // 미리보기 동기화
     deselectFurnitureAdjustment();
   } else {
     // 벽지의 경우 중복 안됨
@@ -1625,8 +1686,15 @@ function equipItem(item) {
         const x = SHOP_ITEMS.find(i => i.id === id);
         return x.sub !== 'wallpaper';
       });
+      currentPreviewFurniture = currentPreviewFurniture.filter(id => {
+        const x = SHOP_ITEMS.find(i => i.id === id);
+        return x.sub !== 'wallpaper';
+      });
     }
     userData.equippedFurniture.push(item.id);
+    if (!currentPreviewFurniture.includes(item.id)) {
+      currentPreviewFurniture.push(item.id);
+    }
     selectFurnitureAdjustment(item);
   }
   
@@ -1639,8 +1707,10 @@ function unequipItem(item) {
   playClick();
   if (item.category === 'costume') {
     userData.equippedCostume.skin = 'skin_base';
+    currentPreviewSkin = 'skin_base'; // 미리보기 동기화
   } else {
     userData.equippedFurniture = userData.equippedFurniture.filter(id => id !== item.id);
+    currentPreviewFurniture = currentPreviewFurniture.filter(id => id !== item.id); // 미리보기 동기화
     if (activeAdjustingFurnitureId === item.id) {
       deselectFurnitureAdjustment();
     }
