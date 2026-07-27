@@ -782,6 +782,144 @@ button {
   border-bottom-width: 2px;
 }
 
+/* 곡선형 로드맵 (Sphere Walk Cycle - Curved Carousel) 스타일 */
+.map-container-curved {
+  flex-grow: 1;
+  background: radial-gradient(circle at 50% 180%, #A2D9CE 0%, #2E4053 100%);
+  border-radius: var(--border-radius-large);
+  border: 3.5px solid #7D9F86;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 4px 16px rgba(0,0,0,0.15);
+  margin-bottom: 15px;
+  height: 380px; /* 적당히 아늑한 높이 */
+}
+
+/* 중앙 상단 로롱이 아바타 */
+.rorong-globe-avatar {
+  position: absolute;
+  top: 40px; /* 곡선 정점에 위치 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 90px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.rorong-globe-avatar.walking {
+  animation: rorongGlobeWalk 0.25s infinite alternate ease-in-out;
+}
+
+@keyframes rorongGlobeWalk {
+  0% {
+    transform: translateX(-50%) translateY(0) rotate(-6deg);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-10px) rotate(6deg);
+  }
+}
+
+/* 뒷배경 점선 곡선 */
+.curved-path-svg-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 250px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+.curved-path-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 가로 스크롤 영역 */
+.island-map-scroll {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  z-index: 2;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 140px; /* 로롱이 아래에서 시작하도록 */
+}
+
+/* Webkit 브라우저 스크롤바 숨기기 (깔끔한 UI용) */
+.island-map-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.island-map-scroll {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.island-map-track {
+  display: flex;
+  flex-direction: row;
+  gap: 60px;
+  padding: 0 calc(50% - 90px); /* 스크롤 양 끝 카드가 중앙에 올 수 있게 패딩 확보 */
+  min-width: max-content;
+  align-items: flex-start;
+}
+
+/* 개별 스테이지 카드 (기본 배치) */
+.island-node {
+  width: 180px;
+  background-color: var(--color-white);
+  border-radius: var(--border-radius-medium);
+  border: 2.5px solid #A2D9CE;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border-bottom: 5px solid #85C1E9;
+  transition: transform 0.1s ease-out, box-shadow 0.25s ease-out, border-color 0.25s ease-out;
+  scroll-snap-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+.island-node.active-stage {
+  border-color: var(--color-primary);
+  border-bottom-color: var(--color-primary-dark);
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+}
+
+.island-node.locked {
+  background-color: #EAE6DF;
+  border-color: #D5CFC6;
+  border-bottom-color: #C3BBB0;
+  cursor: not-allowed;
+}
+
+.island-graphic {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2.5px solid var(--color-white);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+.island-label-globe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 .roadmap-wrapper {
   padding: 20px 16px;
   display: flex;
@@ -857,19 +995,6 @@ button {
   border-radius: 50%;
   border: 4px dashed #A3E4D7;
   pointer-events: none;
-}
-
-/* 로롱이 지구본 위 걷기 아바타 */
-.rorong-globe-avatar {
-  position: absolute;
-  top: -75px; /* 지구본 위 정중앙 */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 85px;
-  height: 85px;
-  z-index: 10;
-  pointer-events: none;
-  transition: transform 0.2s ease-out;
 }
 
 .rorong-globe-avatar.walking {

@@ -565,6 +565,7 @@ function renderRoadmap() {
   // 모든 스테이지 노드 잠금 여부 반영
   for (let stageNum = 1; stageNum <= 12; stageNum++) {
     const node = document.getElementById(`island-stage-${stageNum}`);
+    if (!node) continue;
     const isUnlocked = userData.unlockedStages.includes(stageNum);
     
     if (isUnlocked) {
@@ -584,17 +585,21 @@ function renderRoadmap() {
     }
   }
   
-  // 지구본 회전 각도 설정
-  const globe = document.querySelector('.island-map-globe');
-  if (globe) {
-    const targetRotation = -(userData.currentStage - 1) * 30;
-    globe.style.transform = `rotate(${targetRotation}deg)`;
-  }
-  
   // 버튼 라벨 상태 업데이트
   const activeStageNode = document.getElementById(`island-stage-${userData.currentStage}`);
   const stageName = activeStageNode ? activeStageNode.querySelector('.stage-title').textContent : `Stage ${userData.currentStage}`;
   document.getElementById('btn-start-learn').querySelector('span').textContent = `[${stageName}] 학습하기 (5문제)`;
+
+  // 활성화된 카드를 중앙으로 가로 스크롤
+  setTimeout(() => {
+    if (activeStageNode) {
+      activeStageNode.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+    const scrollContainer = document.querySelector('.island-map-scroll');
+    if (scrollContainer) {
+      scrollContainer.dispatchEvent(new Event('scroll'));
+    }
+  }, 100);
 }
 
 // 10. 무한 문제 생성기 및 채점 엔진 (Screen 04)
@@ -1944,15 +1949,6 @@ window.addEventListener('DOMContentLoaded', () => {
       playClick();
       
       if (userData.unlockedStages.includes(stageNum)) {
-        if (userData.currentStage !== stageNum) {
-          const rorong = document.getElementById('roadmap-rorong-character');
-          if (rorong) {
-            rorong.classList.add('walking');
-            setTimeout(() => {
-              rorong.classList.remove('walking');
-            }, 1200);
-          }
-        }
         userData.currentStage = stageNum;
         saveUserData();
         renderRoadmap();
@@ -1963,6 +1959,52 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     };
   });
+
+  // 곡선형 로드맵 가로 스크롤 이벤트 바인딩 및 커브 모사 연산
+  const scrollContainer = document.querySelector('.island-map-scroll');
+  const rorong = document.getElementById('roadmap-rorong-character');
+  
+  if (scrollContainer) {
+    let isScrolling = null;
+    
+    const updateRoadmapCurve = () => {
+      if (rorong) {
+        rorong.classList.add('walking');
+        clearTimeout(isScrolling);
+        isScrolling = setTimeout(() => {
+          rorong.classList.remove('walking');
+        }, 150);
+      }
+      
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const containerCenter = containerRect.left + containerRect.width / 2;
+      const nodes = scrollContainer.querySelectorAll('.island-node');
+      
+      nodes.forEach(node => {
+        const nodeRect = node.getBoundingClientRect();
+        const nodeCenter = nodeRect.left + nodeRect.width / 2;
+        
+        // 중심축 기준 오프셋 계산
+        const distance = nodeCenter - containerCenter;
+        const maxDist = containerRect.width / 1.1;
+        const ratio = Math.min(Math.max(distance / maxDist, -1), 1);
+        
+        // 포물선 Y 오프셋 (양쪽 끝으로 갈수록 아래로 내려감)
+        const yOffset = ratio * ratio * 130;
+        
+        // 자연스럽게 눕도록 하는 기울기(회전)
+        const tilt = ratio * 15;
+        
+        node.style.transform = `translateY(${yOffset}px) rotate(${tilt}deg)`;
+      });
+    };
+    
+    scrollContainer.addEventListener('scroll', updateRoadmapCurve);
+    window.addEventListener('resize', updateRoadmapCurve);
+    
+    // 첫 화면 렌더링 시 커브 갱신
+    setTimeout(updateRoadmapCurve, 300);
+  }
   
   // 오늘 학습 시작 버튼
   document.getElementById('btn-start-learn').onclick = () => {

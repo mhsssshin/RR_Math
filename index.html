@@ -147,19 +147,23 @@
             </div>
           </div>
 
-          <!-- 섬 모양의 학습 길 맵 -->
-          <!-- 지구본 회전 로드맵 (Sphere Walk Cycle) -->
-          <div class="map-container-globe">
-            <div class="globe-wrapper">
-              <!-- 지구본 맨 위에 위치한 로롱이 캐릭터 -->
-              <div id="roadmap-rorong-character" class="rorong-globe-avatar"></div>
-              
-              <!-- 회전하는 지구본 본체 -->
-              <div class="island-map-globe">
-                <div class="globe-orbit-dashed"></div>
-                
+          <!-- 곡선형 로드맵 (Sphere Walk Cycle - Curved Carousel) -->
+          <div class="map-container-curved">
+            <!-- 곡선 정점의 캐릭터 -->
+            <div id="roadmap-rorong-character" class="rorong-globe-avatar"></div>
+
+            <!-- 뒷배경 점선 곡선 -->
+            <div class="curved-path-svg-container">
+              <svg viewBox="0 0 1000 200" preserveAspectRatio="none" class="curved-path-svg">
+                <path d="M 0,200 Q 500,20 1000,200" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-dasharray="10, 10" />
+              </svg>
+            </div>
+
+            <!-- 가로 스크롤 가능한 트랙 -->
+            <div class="island-map-scroll">
+              <div class="island-map-track">
                 <!-- Stage 1 섬 -->
-                <div class="island-node" id="island-stage-1" data-stage="1" style="--angle: -90deg;">
+                <div class="island-node" id="island-stage-1" data-stage="1">
                   <div class="island-graphic baby-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 1</span>
@@ -169,7 +173,7 @@
                 </div>
 
                 <!-- Stage 2 섬 -->
-                <div class="island-node locked" id="island-stage-2" data-stage="2" style="--angle: -60deg;">
+                <div class="island-node locked" id="island-stage-2" data-stage="2">
                   <div class="island-graphic rabbit-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 2</span>
@@ -179,7 +183,7 @@
                 </div>
 
                 <!-- Stage 3 섬 -->
-                <div class="island-node locked" id="island-stage-3" data-stage="3" style="--angle: -30deg;">
+                <div class="island-node locked" id="island-stage-3" data-stage="3">
                   <div class="island-graphic squirrel-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 3</span>
@@ -189,7 +193,7 @@
                 </div>
 
                 <!-- Stage 4 섬 -->
-                <div class="island-node locked" id="island-stage-4" data-stage="4" style="--angle: 0deg;">
+                <div class="island-node locked" id="island-stage-4" data-stage="4">
                   <div class="island-graphic bear-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 4</span>
@@ -199,7 +203,7 @@
                 </div>
 
                 <!-- Stage 5 섬 -->
-                <div class="island-node locked" id="island-stage-5" data-stage="5" style="--angle: 30deg;">
+                <div class="island-node locked" id="island-stage-5" data-stage="5">
                   <div class="island-graphic lion-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 5</span>
@@ -209,7 +213,7 @@
                 </div>
 
                 <!-- Stage 6 섬 -->
-                <div class="island-node locked" id="island-stage-6" data-stage="6" style="--angle: 60deg;">
+                <div class="island-node locked" id="island-stage-6" data-stage="6">
                   <div class="island-graphic fox-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 6</span>
@@ -219,7 +223,7 @@
                 </div>
 
                 <!-- Stage 7 섬 -->
-                <div class="island-node locked" id="island-stage-7" data-stage="7" style="--angle: 90deg;">
+                <div class="island-node locked" id="island-stage-7" data-stage="7">
                   <div class="island-graphic elephant-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 7</span>
@@ -229,7 +233,7 @@
                 </div>
 
                 <!-- Stage 8 섬 -->
-                <div class="island-node locked" id="island-stage-8" data-stage="8" style="--angle: 120deg;">
+                <div class="island-node locked" id="island-stage-8" data-stage="8">
                   <div class="island-graphic koala-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 8</span>
@@ -239,7 +243,7 @@
                 </div>
 
                 <!-- Stage 9 섬 -->
-                <div class="island-node locked" id="island-stage-9" data-stage="9" style="--angle: 150deg;">
+                <div class="island-node locked" id="island-stage-9" data-stage="9">
                   <div class="island-graphic tiger-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 9</span>
@@ -249,7 +253,7 @@
                 </div>
 
                 <!-- Stage 10 섬 -->
-                <div class="island-node locked" id="island-stage-10" data-stage="10" style="--angle: 180deg;">
+                <div class="island-node locked" id="island-stage-10" data-stage="10">
                   <div class="island-graphic dragon-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 10</span>
@@ -259,7 +263,7 @@
                 </div>
 
                 <!-- Stage 11 섬 -->
-                <div class="island-node locked" id="island-stage-11" data-stage="11" style="--angle: 210deg;">
+                <div class="island-node locked" id="island-stage-11" data-stage="11">
                   <div class="island-graphic eagle-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 11</span>
@@ -269,7 +273,7 @@
                 </div>
 
                 <!-- Stage 12 섬 -->
-                <div class="island-node locked" id="island-stage-12" data-stage="12" style="--angle: 240deg;">
+                <div class="island-node locked" id="island-stage-12" data-stage="12">
                   <div class="island-graphic owl-island"></div>
                   <div class="island-label-globe">
                     <span class="stage-tag">Stage 12</span>
