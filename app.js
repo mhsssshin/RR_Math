@@ -23,18 +23,18 @@ let userData = { ...DEFAULT_USER_DATA };
 
 const SHOP_ITEMS = [
   // 카테고리: costume (모자, 안경, 의상 등)
-  { id: 'hat_straw', category: 'costume', sub: 'hat', name: '밀짚 모자 👒', emoji: '👒', price: 20, style: { top: '-5px', left: '20px', width: '60px', height: '40px', transform: 'rotate(-5deg)' } },
-  { id: 'hat_wizard', category: 'costume', sub: 'hat', name: '마법사 모자 🧙', emoji: '🧙', price: 50, style: { top: '-25px', left: '15px', width: '70px', height: '60px', transform: 'rotate(-10deg)' } },
-  { id: 'hat_crown', category: 'costume', sub: 'hat', name: '황금 왕관 👑', emoji: '👑', price: 70, style: { top: '-15px', left: '22px', width: '56px', height: '40px' } },
-  { id: 'hat_pirate', category: 'costume', sub: 'hat', name: '해적 선장 모자 🏴‍☠️', emoji: '🏴‍☠️', price: 45, style: { top: '-12px', left: '18px', width: '65px', height: '42px', transform: 'rotate(-3deg)' } },
-  { id: 'hat_detective', category: 'costume', sub: 'hat', name: '탐정 모자 🕵️', emoji: '🕵️', price: 60, style: { top: '-10px', left: '20px', width: '60px', height: '40px' } },
-  { id: 'glasses_normal', category: 'costume', sub: 'glasses', name: '똘똘이 안경 👓', emoji: '👓', price: 15, style: { top: '22px', left: '22px', width: '56px', height: '24px' } },
-  { id: 'glasses_star', category: 'costume', sub: 'glasses', name: '별 선글라스 🕶️', emoji: '🕶️', price: 40, style: { top: '24px', left: '22px', width: '56px', height: '22px', filter: 'hue-rotate(180deg)' } },
-  { id: 'glasses_funny', category: 'costume', sub: 'glasses', name: '코믹 안경 🥸', emoji: '🥸', price: 30, style: { top: '20px', left: '20px', width: '60px', height: '32px' } },
-  { id: 'bowtie_red', category: 'costume', sub: 'clothing', name: '나비 넥타이 🎀', emoji: '🎀', price: 10, style: { top: '50px', left: '33px', width: '34px', height: '22px' } },
-  { id: 'costume_detective', category: 'costume', sub: 'clothing', name: '탐정 망토 🕵️', emoji: '🧥', price: 80, style: { top: '52px', left: '15px', width: '70px', height: '40px' } },
-  { id: 'costume_cape', category: 'costume', sub: 'clothing', name: '영웅 망토 🦸', emoji: '🦸', price: 75, style: { top: '50px', left: '12px', width: '76px', height: '45px' } },
-  { id: 'costume_scarf', category: 'costume', sub: 'clothing', name: '빨간 목도리 🧣', emoji: '🧣', price: 25, style: { top: '48px', left: '24px', width: '52px', height: '26px' } },
+  { id: 'hat_straw', category: 'costume', sub: 'hat', name: '밀짚 모자 👒', emoji: '👒', price: 20, style: { top: '-5%', left: '20%', width: '60%', height: '40%', fontSize: '4.2rem', transform: 'rotate(-5deg)' } },
+  { id: 'hat_wizard', category: 'costume', sub: 'hat', name: '마법사 모자 🧙', emoji: '🧙', price: 50, style: { top: '-25%', left: '15%', width: '70%', height: '60%', fontSize: '4.8rem', transform: 'rotate(-10deg)' } },
+  { id: 'hat_crown', category: 'costume', sub: 'hat', name: '황금 왕관 👑', emoji: '👑', price: 70, style: { top: '-15%', left: '22%', width: '56%', height: '40%', fontSize: '3.6rem' } },
+  { id: 'hat_pirate', category: 'costume', sub: 'hat', name: '해적 선장 모자 🏴‍☠️', emoji: '🏴‍☠️', price: 45, style: { top: '-12%', left: '17.5%', width: '65%', height: '42%', fontSize: '4.2rem', transform: 'rotate(-3deg)' } },
+  { id: 'hat_detective', category: 'costume', sub: 'hat', name: '탐정 모자 🕵️', emoji: '🕵️', price: 60, style: { top: '-10%', left: '20%', width: '60%', height: '40%', fontSize: '4.0rem' } },
+  { id: 'glasses_normal', category: 'costume', sub: 'glasses', name: '똘똘이 안경 👓', emoji: '👓', price: 15, style: { top: '22%', left: '22%', width: '56%', height: '24%', fontSize: '3.2rem' } },
+  { id: 'glasses_star', category: 'costume', sub: 'glasses', name: '별 선글라스 🕶️', emoji: '🕶️', price: 40, style: { top: '24%', left: '22%', width: '56%', height: '22%', fontSize: '3.2rem', filter: 'hue-rotate(180deg)' } },
+  { id: 'glasses_funny', category: 'costume', sub: 'glasses', name: '코믹 안경 🥸', emoji: '🥸', price: 30, style: { top: '20%', left: '20%', width: '60%', height: '32%', fontSize: '3.6rem' } },
+  { id: 'bowtie_red', category: 'costume', sub: 'clothing', name: '나비 넥타이 🎀', emoji: '🎀', price: 10, style: { top: '50%', left: '33%', width: '34%', height: '22%', fontSize: '2.2rem' } },
+  { id: 'costume_detective', category: 'costume', sub: 'clothing', name: '탐정 망토 🕵️', emoji: '🧥', price: 80, style: { top: '52%', left: '15%', width: '70%', height: '40%', fontSize: '4.5rem' } },
+  { id: 'costume_cape', category: 'costume', sub: 'clothing', name: '영웅 망토 🦸', emoji: '🦸', price: 75, style: { top: '50%', left: '12%', width: '76%', height: '45%', fontSize: '4.5rem' } },
+  { id: 'costume_scarf', category: 'costume', sub: 'clothing', name: '빨간 목도리 🧣', emoji: '🧣', price: 25, style: { top: '48%', left: '24%', width: '52%', height: '26%', fontSize: '3.2rem' } },
   
   // 카테고리: furniture (배경 벽지 및 가구)
   { id: 'bg_forest', category: 'furniture', sub: 'wallpaper', name: '초록 숲속 벽지 🌳', emoji: '🌳', price: 30, roomClass: 'room-theme-forest', roomBg: '#D5F5E3' },
@@ -1264,7 +1264,7 @@ function updateCharacterCostumes() {
       el.style.top = item.style.top;
       el.style.width = item.style.width || 'auto';
       el.style.height = item.style.height || 'auto';
-      el.style.fontSize = '3.5rem';
+      el.style.fontSize = item.style.fontSize || '3.5rem';
       el.style.textAlign = 'center';
       el.style.pointerEvents = 'none';
       
