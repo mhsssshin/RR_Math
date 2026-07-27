@@ -873,6 +873,7 @@ button {
 /* 개별 스테이지 카드 (기본 배치) */
 .island-node {
   width: 180px;
+  flex-shrink: 0; /* 카드가 좁은 공간에서 줄어들지 않도록 고정 */
   background-color: var(--color-white);
   border-radius: var(--border-radius-medium);
   border: 2.5px solid #A2D9CE;

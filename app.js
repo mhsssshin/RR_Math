@@ -1891,16 +1891,27 @@ window.addEventListener('DOMContentLoaded', () => {
       }
       
       const containerRect = scrollContainer.getBoundingClientRect();
-      const containerCenter = containerRect.left + containerRect.width / 2;
+      let containerWidth = containerRect.width;
+      let containerLeft = containerRect.left;
+      if (containerWidth === 0) {
+        containerWidth = 980; // 태블릿 모드 기준 디폴트 컨테이너 크기 적용
+        containerLeft = 0;
+      }
+      const containerCenter = containerLeft + containerWidth / 2;
       const nodes = scrollContainer.querySelectorAll('.island-node');
       
       nodes.forEach(node => {
         const nodeRect = node.getBoundingClientRect();
-        const nodeCenter = nodeRect.left + nodeRect.width / 2;
+        let nodeCenter = nodeRect.left + nodeRect.width / 2;
+        
+        // 화면이 비활성 상태라 bounding rect가 0인 경우 offset 기반 위치 추정하여 NaN 예방
+        if (nodeRect.width === 0) {
+          nodeCenter = node.offsetLeft - scrollContainer.scrollLeft + 90; // 카드 너비 180의 절반인 90 더함
+        }
         
         // 중심축 기준 오프셋 계산
         const distance = nodeCenter - containerCenter;
-        const maxDist = containerRect.width / 1.4; // 부드러운 하강 곡률 기준값
+        const maxDist = containerWidth / 1.4; // 부드러운 하강 곡률 기준값
         const ratio = Math.min(Math.max(distance / maxDist, -1), 1);
         
         // 포물선 Y 오프셋 (양쪽 끝으로 갈수록 아래로 내려감) - 최대 70px로 제한하여 클리핑 방지
