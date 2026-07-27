@@ -40,6 +40,16 @@ const SHOP_ITEMS = [
   { id: 'furniture_window', category: 'furniture', sub: 'deco', name: '동그라미 창문 🖼️', emoji: '🖼️', price: 45, posX: '45%', posY: '15%' }
 ];
 
+// 2.5. 배열 셔플 (질문 보기 랜덤화를 위한 유틸리티)
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 // 3. 상태 관리 변수
 let isMuted = false;
 let currentQuestionIndex = 0;       // 현재 0~4번 학습 문제 인덱스
@@ -289,7 +299,8 @@ function loadTestQuestion() {
   // 3개 보기 또는 4개 보기 대응
   optionsDiv.className = `options-grid cols-${currentTestQuestion.options.length}`;
   
-  currentTestQuestion.options.forEach(opt => {
+  const shuffledOptions = shuffleArray(currentTestQuestion.options);
+  shuffledOptions.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'option-card bounce-hover';
     btn.innerHTML = opt;
@@ -785,7 +796,8 @@ function loadLearningQuestion() {
   
   optionsDiv.className = `options-grid cols-${currentQ.options.length}`;
   
-  currentQ.options.forEach(opt => {
+  const shuffledOptions = shuffleArray(currentQ.options);
+  shuffledOptions.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'option-card bounce-hover';
     btn.innerHTML = opt;
@@ -1204,7 +1216,8 @@ function startSingleIncorrectReview(q, listIdx) {
   optionsDiv.innerHTML = '';
   optionsDiv.className = `options-grid cols-${q.options.length}`;
   
-  q.options.forEach(opt => {
+  const shuffledOptions = shuffleArray(q.options);
+  shuffledOptions.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'option-card bounce-hover';
     btn.innerHTML = opt;
@@ -1305,7 +1318,8 @@ function loadIncorrectReviewLoop() {
   optionsDiv.innerHTML = '';
   optionsDiv.className = `options-grid cols-${currentQ.options.length}`;
   
-  currentQ.options.forEach(opt => {
+  const shuffledOptions = shuffleArray(currentQ.options);
+  shuffledOptions.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'option-card bounce-hover';
     btn.innerHTML = opt;
