@@ -1273,13 +1273,9 @@ function renderMyRoom() {
         e.preventDefault();
         e.stopPropagation();
         
-        playClick();
+        // 터치하자마자 조절 상태로 포커스 지정 및 즉시 점선 그리기!
         selectFurnitureAdjustment(item);
-        
-        // 실시간 테두리 활성화를 위해 활성 가구 아이디 갱신
-        if (!isActive) {
-          renderMyRoom();
-        }
+        renderMyRoom();
         
         const isTouch = e.type === 'touchstart';
         const startX = isTouch ? e.touches[0].clientX : e.clientX;
@@ -1289,19 +1285,32 @@ function renderMyRoom() {
         const initY = transform.y;
         
         const rect = roomBg.getBoundingClientRect();
+        let hasMoved = false;
         
         const onDrag = (moveEvent) => {
           const moveX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
           const moveY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
           
-          const deltaX = (moveX - startX) * (100 / rect.width);
-          const deltaY = (moveY - startY) * (100 / rect.height);
+          const dx = moveX - startX;
+          const dy = moveY - startY;
+          
+          // 미세 오차(3px) 이상 움직였을 때만 드래그로 판정
+          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+            hasMoved = true;
+          }
+          
+          const deltaX = dx * (100 / rect.width);
+          const deltaY = dy * (100 / rect.height);
           
           transform.x = Math.max(-20, Math.min(120, initX + deltaX));
           transform.y = Math.max(-20, Math.min(120, initY + deltaY));
           
-          el.style.left = `${transform.x}%`;
-          el.style.top = `${transform.y}%`;
+          // DOM의 left/top 실시간 갱신 (선택된 활성 요소 기준)
+          const activeEl = document.querySelector('.decor-furniture-item.active');
+          if (activeEl) {
+            activeEl.style.left = `${transform.x}%`;
+            activeEl.style.top = `${transform.y}%`;
+          }
         };
         
         const endDrag = () => {
@@ -1309,8 +1318,20 @@ function renderMyRoom() {
           document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
           saveUserData();
           
-          el.classList.add('jump');
-          setTimeout(() => el.classList.remove('jump'), 500);
+          if (!hasMoved) {
+            // 움직이지 않고 클릭만 한 경우: 선택 피드백음 재생
+            playTone(523, 0.08, 'sine');
+            setTimeout(() => playTone(784, 0.12, 'sine'), 50);
+          } else {
+            // 드래그해서 배치 완료한 경우: 가볍게 탭 애니메이션 실행
+            const activeEl = document.querySelector('.decor-furniture-item.active');
+            if (activeEl) {
+              activeEl.classList.add('jump');
+              setTimeout(() => activeEl.classList.remove('jump'), 500);
+            }
+          }
+          
+          renderMyRoom();
         };
         
         document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
@@ -1319,15 +1340,6 @@ function renderMyRoom() {
       
       emojiEl.addEventListener('mousedown', startDrag);
       emojiEl.addEventListener('touchstart', startDrag, { passive: false });
-      
-      // 2. 가구 클릭 상호작용
-      emojiEl.onclick = (e) => {
-        e.stopPropagation();
-        playTone(523, 0.08, 'sine');
-        setTimeout(() => playTone(784, 0.12, 'sine'), 50);
-        selectFurnitureAdjustment(item);
-        renderMyRoom();
-      };
       
       // 3. 삭제(❌) 버튼 바인딩
       deleteBtn.onclick = (e) => {
@@ -1345,6 +1357,7 @@ function renderMyRoom() {
         const startX = isTouch ? e.touches[0].clientX : e.clientX;
         const startY = isTouch ? e.touches[0].clientY : e.clientY;
         
+        // parent element(el)의 본래 중심점을 계산하기 위해 parent의 bounding rect 사용
         const parentRect = el.getBoundingClientRect();
         const centerX = parentRect.left + parentRect.width / 2;
         const centerY = parentRect.top + parentRect.height / 2;
