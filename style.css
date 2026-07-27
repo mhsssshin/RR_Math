@@ -812,53 +812,59 @@ button {
   margin-top: 4px;
 }
 
-/* 맵 스크롤 컨테이너 */
+/* 맵 스크롤 컨테이너 - 가로 스와이프형 지구본 분위기 */
 .map-container {
   flex-grow: 1;
-  background-color: #F1F6EC;
+  background: radial-gradient(circle at 50% 120%, #E8F8F5 0%, #A2D9CE 35%, #2E4053 100%);
   border-radius: var(--border-radius-large);
-  border: 3px solid #C4D3B6;
+  border: 3.5px solid #7D9F86;
   position: relative;
-  overflow-y: auto;
-  box-shadow: inset 0 4px 10px rgba(0,0,0,0.06);
-  padding: 30px 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  box-shadow: inset 0 4px 16px rgba(0,0,0,0.15);
+  padding: 0 20px;
   margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
 }
 
 .island-map {
   display: flex;
-  flex-direction: column-reverse; /* 아래부터 위로 (Stage 1이 아래) */
-  gap: 60px;
-  position: relative;
+  flex-direction: row;
+  gap: 50px;
   align-items: center;
+  position: relative;
+  min-width: max-content;
+  height: 240px;
+  padding: 0 60px;
 }
 
-/* 맵 경로 연결선 */
+/* 맵 경로 연결선 (가로선) */
 .map-path-line {
   position: absolute;
-  width: 8px;
+  top: 50%;
+  left: 60px;
+  right: 60px;
+  height: 6px;
   background: repeating-linear-gradient(
-    to bottom,
-    #D0DBC4,
-    #D0DBC4 8px,
-    transparent 8px,
-    transparent 16px
+    to right,
+    #B2DFDB,
+    #B2DFDB 10px,
+    transparent 10px,
+    transparent 20px
   );
   z-index: 1;
+  transform: translateY(-50%);
 }
-
-.path-1-2 { bottom: 90px; height: 90px; }
-.path-2-3 { bottom: 250px; height: 90px; }
-.path-3-4 { bottom: 410px; height: 90px; }
-.path-4-5 { bottom: 570px; height: 90px; }
 
 /* 스테이지 섬 카드 */
 .island-node {
-  width: 100%;
-  max-width: 320px;
+  width: 240px;
   background-color: var(--color-white);
   border-radius: var(--border-radius-medium);
-  border: 2px solid #D1E0C7;
+  border: 2.5px solid #A2D9CE;
   padding: 12px;
   display: flex;
   align-items: center;
@@ -866,26 +872,38 @@ button {
   z-index: 2;
   cursor: pointer;
   position: relative;
-  border-bottom: 5px solid #BDD1B2;
-  transition: all 0.2s ease-out;
+  border-bottom: 5px solid #85C1E9;
+  transition: all 0.25s ease-out;
+  scroll-snap-align: center;
 }
 
-.island-node:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+/* 지구본을 회전하며 따라가는 듯한 물결(파도) 모양 상하 정렬 */
+.island-node:nth-child(odd) {
+  transform: translateY(22px);
+}
+.island-node:nth-child(even) {
+  transform: translateY(-22px);
+}
+
+.island-node:nth-child(odd):hover {
+  transform: translateY(12px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+}
+.island-node:nth-child(even):hover {
+  transform: translateY(-32px) scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.12);
 }
 
 .island-node:active {
-  transform: translateY(2px);
+  transform: translateY(2px) scale(0.98);
   border-bottom-width: 2px;
 }
 
 .island-node.locked {
-  background-color: #E2E4E1;
-  border-color: #C3C7C2;
-  border-bottom-color: #B2B7B1;
+  background-color: #EAE6DF;
+  border-color: #D5CFC6;
+  border-bottom-color: #C3BBB0;
   cursor: not-allowed;
-  opacity: 0.8;
 }
 
 .island-node.active-stage {
@@ -911,7 +929,14 @@ button {
 .rabbit-island { background: linear-gradient(135deg, #FFE0B2, #FFA726); }
 .squirrel-island { background: linear-gradient(135deg, #D7CCC8, #8D6E63); }
 .bear-island { background: linear-gradient(135deg, #C5CAE9, #5C6BC0); }
-.fox-island { background: linear-gradient(135deg, #FFE082, #FFB300); }
+.lion-island { background: linear-gradient(135deg, #FFE082, #FF8F00); }
+.fox-island { background: linear-gradient(135deg, #FFCC80, #D35400); }
+.elephant-island { background: linear-gradient(135deg, #CFD8DC, #546E7A); }
+.koala-island { background: linear-gradient(135deg, #E0E0E0, #757575); }
+.tiger-island { background: linear-gradient(135deg, #FFCC80, #E65100); }
+.dragon-island { background: linear-gradient(135deg, #A5D6A7, #2E7D32); }
+.eagle-island { background: linear-gradient(135deg, #B3E5FC, #0288D1); }
+.owl-island { background: linear-gradient(135deg, #D1C4E9, #5E35B1); }
 
 .island-node.locked .island-graphic {
   filter: grayscale(1);

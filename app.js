@@ -302,7 +302,7 @@ let usedTestQuestionIds = new Set(); // 테스트 문제 중복 방지용
 function startLevelTest() {
   testScore = 0;
   testCurrentStep = 0;
-  testCurrentDifficulty = 2; // 난이도 2(토끼)부터 시작하여 적응형으로 이동
+  testCurrentDifficulty = 4; // 난이도 4(5세심)부터 시작하여 적응형으로 이동
   testAnswersHistory = [];
   usedTestQuestionIds = new Set(); // 테스트 시작 시 초기화
   
@@ -515,8 +515,8 @@ function selectTestAnswer(btn, selected, correct) {
     playCorrect();
     testScore++;
     
-    // 정답 시 난이도 업 (최대 5)
-    if (testCurrentDifficulty < 5) {
+    // 정답 시 난이도 업 (최대 12)
+    if (testCurrentDifficulty < 12) {
       testCurrentDifficulty++;
     }
   } else {
@@ -563,7 +563,7 @@ function finishLevelTest() {
 // 9. 로드맵 (Screen 03) 렌더링
 function renderRoadmap() {
   // 모든 스테이지 노드 잠금 여부 반영
-  for (let stageNum = 1; stageNum <= 5; stageNum++) {
+  for (let stageNum = 1; stageNum <= 12; stageNum++) {
     const node = document.getElementById(`island-stage-${stageNum}`);
     const isUnlocked = userData.unlockedStages.includes(stageNum);
     
@@ -819,7 +819,7 @@ function finishLearningSession() {
   
   // 만약 해당 스테이지를 첫 정주행한 경우 다음 스테이지도 언락해줌
   const nextStageNum = currentActiveLearningStage + 1;
-  if (nextStageNum <= 5 && !userData.unlockedStages.includes(nextStageNum)) {
+  if (nextStageNum <= 12 && !userData.unlockedStages.includes(nextStageNum)) {
     userData.unlockedStages.push(nextStageNum);
   }
   
