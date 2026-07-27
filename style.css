@@ -845,11 +845,9 @@ button {
   overflow-y: hidden;
   position: relative;
   z-index: 2;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
   display: flex;
   align-items: flex-start;
-  padding-top: 140px; /* 로롱이 아래에서 시작하도록 */
+  padding-top: 90px; /* 로롱이 바로 밑으로 여백을 줄여 전체 노출 극대화 */
   cursor: grab;
 }
 
