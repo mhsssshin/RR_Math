@@ -1748,6 +1748,44 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 데이터 로드
   loadUserData();
+
+  // 도토리 13번 연속 클릭 이스터에그 바인딩
+  let acornClickCount = 0;
+  let lastAcornClickTime = 0;
+  const acornCounterBtn = document.getElementById('header-acorn-counter');
+  if (acornCounterBtn) {
+    acornCounterBtn.style.cursor = 'pointer';
+    acornCounterBtn.onclick = () => {
+      const now = Date.now();
+      if (now - lastAcornClickTime < 800) { // 0.8초 이내 연속 클릭
+        acornClickCount++;
+      } else {
+        acornClickCount = 1;
+      }
+      lastAcornClickTime = now;
+
+      // 클릭 시마다 피치 상승 음계 소리
+      playTone(400 + acornClickCount * 40, 0.06, 'sine');
+      
+      // 약한 바운스 피드백
+      acornCounterBtn.style.transform = 'scale(1.1)';
+      setTimeout(() => { acornCounterBtn.style.transform = 'scale(1)'; }, 100);
+
+      if (acornClickCount === 13) {
+        acornClickCount = 0;
+        userData.acorns += 100;
+        saveUserData();
+        playSuccess(); // 화려한 축하 멜로디
+        showToast("🐿️ 비밀의 도토리 이스터에그 발견! 도토리 100개 획득! 🌰+100");
+        
+        // 도토리 카운터 강한 흔들림 효과
+        acornCounterBtn.classList.add('animate-bounce');
+        setTimeout(() => {
+          acornCounterBtn.classList.remove('animate-bounce');
+        }, 1500);
+      }
+    };
+  }
   
   // 사운드 클릭 감지
   document.querySelectorAll('button').forEach(btn => {
