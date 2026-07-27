@@ -190,17 +190,14 @@ function showScreen(screenId) {
     renderMyRoom();
     renderShopItems();
     
-    // 첫 진입 시 '내 방' 탭으로 리셋
-    const tabMyRoom = document.getElementById('tab-myroom');
-    const tabShop = document.getElementById('tab-shop');
-    const screenRoom = document.getElementById('screen-room');
-    if (tabMyRoom && tabShop && screenRoom) {
-      tabMyRoom.classList.add('active');
-      tabShop.classList.remove('active');
-      screenRoom.classList.remove('shop-active');
-      document.getElementById('room-viewer-container').classList.remove('hidden');
-      document.getElementById('room-shop-container').classList.add('hidden');
+    // 첫 진입 시 미세조절기 닫고 두 화면 모두 노출
+    if (typeof deselectAdjustmentItem === 'function') {
+      deselectAdjustmentItem();
     }
+    const roomViewer = document.getElementById('room-viewer-container');
+    const roomShop = document.getElementById('room-shop-container');
+    if (roomViewer) roomViewer.classList.remove('hidden');
+    if (roomShop) roomShop.classList.remove('hidden');
   }
 
   if (screenId === 'screen-roadmap') {
@@ -212,12 +209,22 @@ function showScreen(screenId) {
 function loadUserData() {
   const data = localStorage.getItem('rorongMath_userData');
   if (data) {
-    userData = JSON.parse(data);
-    // 기본 누락 필드 병합 방지 보강
-    userData = { ...DEFAULT_USER_DATA, ...userData };
+    try {
+      userData = JSON.parse(data);
+    } catch (e) {
+      userData = { ...DEFAULT_USER_DATA };
+    }
   } else {
     userData = { ...DEFAULT_USER_DATA };
   }
+  
+  // 구버전 로컬 스토리지 호환성 보강 (널포인터 예방 안전망)
+  userData = { ...DEFAULT_USER_DATA, ...userData };
+  if (!userData.inventory) userData.inventory = [];
+  if (!userData.equippedCostume) userData.equippedCostume = {};
+  if (!userData.equippedFurniture) userData.equippedFurniture = [];
+  if (!userData.costumeTransforms) userData.costumeTransforms = {};
+  
   updateHeaderUI();
   updateCharacterCostumes();
 }
@@ -1263,13 +1270,6 @@ function getCostumeTransform(itemId) {
 }
 
 function selectAdjustmentItem(item) {
-  // 모바일/PC 요술방 탭이 열려있을 때만 조절기 활성화
-  const screenRoom = document.getElementById('screen-room');
-  if (screenRoom && screenRoom.classList.contains('shop-active')) {
-    // 상점 모드일 때는 화면이 복잡하므로 미세조절기는 미작동
-    return;
-  }
-  
   activeAdjustmentItemId = item.id;
   const panel = document.getElementById('costume-adjuster-panel');
   const targetName = document.getElementById('adjuster-target-name');
@@ -1975,27 +1975,49 @@ window.addEventListener('DOMContentLoaded', () => {
     showScreen('screen-roadmap');
   };
   
-  // [Screen 06] 요술 방 꾸미기 바인딩
-  document.getElementById('tab-myroom').onclick = () => {
-    playClick();
-    document.getElementById('tab-myroom').classList.add('active');
-    document.getElementById('tab-shop').classList.remove('active');
-    
-    document.getElementById('screen-room').classList.remove('shop-active');
-    document.getElementById('room-viewer-container').classList.remove('hidden');
-    document.getElementById('room-shop-container').classList.add('hidden');
-  };
+  // 로드맵 화면 상점 바로가기 버튼 바인딩
+  const btnRoadmapGoRoom = document.getElementById('btn-roadmap-go-room');
+  if (btnRoadmapGoRoom) {
+    btnRoadmapGoRoom.onclick = () => {
+      playClick();
+      showScreen('screen-room');
+    };
+  }
+
+  // [Screen 06] 요술 방 꾸미기 바인딩 (구버전 탭과의 하위 호환성 유지)
+  const tabMyRoom = document.getElementById('tab-myroom');
+  if (tabMyRoom) {
+    tabMyRoom.onclick = () => {
+      playClick();
+      tabMyRoom.classList.add('active');
+      const tabShop = document.getElementById('tab-shop');
+      if (tabShop) tabShop.classList.remove('active');
+      
+      const screenRoom = document.getElementById('screen-room');
+      if (screenRoom) screenRoom.classList.remove('shop-active');
+      const roomViewer = document.getElementById('room-viewer-container');
+      if (roomViewer) roomViewer.classList.remove('hidden');
+      const roomShop = document.getElementById('room-shop-container');
+      if (roomShop) roomShop.classList.add('hidden');
+    };
+  }
   
-  document.getElementById('tab-shop').onclick = () => {
-    playClick();
-    deselectAdjustmentItem();
-    document.getElementById('tab-shop').classList.add('active');
-    document.getElementById('tab-myroom').classList.remove('active');
-    
-    document.getElementById('screen-room').classList.add('shop-active');
-    document.getElementById('room-viewer-container').classList.remove('hidden');
-    document.getElementById('room-shop-container').classList.remove('hidden');
-  };
+  const tabShop = document.getElementById('tab-shop');
+  if (tabShop) {
+    tabShop.onclick = () => {
+      playClick();
+      deselectAdjustmentItem();
+      tabShop.classList.add('active');
+      if (tabMyRoom) tabMyRoom.classList.remove('active');
+      
+      const screenRoom = document.getElementById('screen-room');
+      if (screenRoom) screenRoom.classList.add('shop-active');
+      const roomViewer = document.getElementById('room-viewer-container');
+      if (roomViewer) roomViewer.classList.remove('hidden');
+      const roomShop = document.getElementById('room-shop-container');
+      if (roomShop) roomShop.classList.remove('hidden');
+    };
+  }
   
   // 상점 가구/의상 토글 바인딩
   document.querySelectorAll('.shop-filter-btn').forEach(btn => {
