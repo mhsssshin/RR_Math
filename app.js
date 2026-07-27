@@ -1205,10 +1205,10 @@ let currentShopCategory = 'costume';
 function renderMyRoom() {
   const roomBg = document.getElementById('myroom-display-bg');
   const decorLayer = document.getElementById('room-decorations-layer');
-  const costumeLayer = document.getElementById('avatar-costume-layer');
   
-  decorLayer.innerHTML = '';
-  costumeLayer.innerHTML = '';
+  if (decorLayer) {
+    decorLayer.innerHTML = '';
+  }
   
   // 기본 방 배경 초기화
   roomBg.style.backgroundColor = '#FCF3CF';
