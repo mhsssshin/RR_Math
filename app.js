@@ -145,11 +145,40 @@ function playSuccess() {
   });
 }
 
-// 5. TTS 기능 (한국어 음성 서비스)
-function speakText(text) {
+// 5. TTS 기능 (한국어 음성 서비스 - ElevenLabs 정적 mp3 연동 및 Web Speech API 폴백)
+let currentAudio = null;
+
+function speakText(text, questionId) {
   if (isMuted) return;
+  
+  // 기존에 재생 중인 HTML5 오디오가 있다면 정지
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+  
+  // 브라우저 기본 TTS도 즉시 취소
   if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel(); // 진행 중인 낭독 취소
+    window.speechSynthesis.cancel();
+  }
+
+  // ElevenLabs로 생성된 오디오 파일이 매핑되어 있는 경우 우선 재생
+  if (questionId) {
+    const audioPath = `audio/${questionId}.mp3`;
+    currentAudio = new Audio(audioPath);
+    
+    currentAudio.play().catch(err => {
+      console.warn(`[TTS 폴백] 오디오 파일 재생 실패 (${audioPath}). 기본 브라우저 TTS를 사용합니다.`, err);
+      fallbackSpeak(text);
+    });
+  } else {
+    fallbackSpeak(text);
+  }
+}
+
+function fallbackSpeak(text) {
+  if ('speechSynthesis' in window) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'ko-KR';
     utterance.rate = 0.95; // 어린이가 알아듣기 쉽도록 약간 느리게
@@ -275,25 +304,25 @@ function updateHeaderUI() {
 // 8문항 난이도 기반의 절차적 수능형/적응형 테스트를 위해 문항 생성
 const TEST_QUESTION_TEMPLATES = {
   1: [ // Stage 1 레벨 (만 4세 기초)
-    { q: "과일이 모두 몇 개일까요? 세어보세요.", visual: { type: 'emoji', count: 3, item: '🍎' }, options: ["2", "3", "4"], ans: "3", hint: "하나, 둘, 셋... 세 개 있어요!" },
-    { q: "크기가 가장 큰 동물을 골라보세요.", visual: { type: 'emoji_sizes', items: [{e:'🐹', s:1.5}, {e:'🐳', s:3.5}, {e:'🐥', s:1.8}] }, options: ["🐹", "🐳", "🐥"], ans: "🐳", hint: "가장 뚱뚱하고 덩치가 큰 친구는 고래예요." },
-    { q: "모양이 다른 꽃은 무엇일까요?", visual: { type: 'emoji_diff', items: ['🌸', '🌸', '🌻', '🌸'] }, options: ["🌸", "🌻", "🌹"], ans: "🌻", hint: "노랗고 커다란 꽃 하나가 달라요." }
+    { id: "fb_1_1", q: "과일이 모두 몇 개일까요? 세어보세요.", visual: { type: 'emoji', count: 3, item: '🍎' }, options: ["2", "3", "4"], ans: "3", hint: "하나, 둘, 셋... 세 개 있어요!" },
+    { id: "fb_1_2", q: "크기가 가장 큰 동물을 골라보세요.", visual: { type: 'emoji_sizes', items: [{e:'🐹', s:1.5}, {e:'🐳', s:3.5}, {e:'🐥', s:1.8}] }, options: ["🐹", "🐳", "🐥"], ans: "🐳", hint: "가장 뚱뚱하고 덩치가 큰 친구는 고래예요." },
+    { id: "fb_1_3", q: "모양이 다른 꽃은 무엇일까요?", visual: { type: 'emoji_diff', items: ['🌸', '🌸', '🌻', '🌸'] }, options: ["🌸", "🌻", "🌹"], ans: "🌻", hint: "노랗고 커다란 꽃 하나가 달라요." }
   ],
   2: [ // Stage 2 레벨 (만 4세 심화)
-    { q: "과일을 모두 세어볼까요?", visual: { type: 'emoji', count: 7, item: '🍊' }, options: ["6", "7", "8"], ans: "7", hint: "손가락으로 짚어가며 7까지 세어봐요!" },
-    { q: "규칙을 보고 빈칸에 들어갈 과일을 골라보세요. 바나나, 사과, 바나나, 사과, 다음은 무엇일까요?", visual: { type: 'pattern', items: ['🍌', '🍎', '🍌', '🍎', '?'] }, options: ["🍌", "🍎", "🍉"], ans: "🍌", hint: "바나나 다음엔 사과, 사과 다음엔 바나나예요." }
+    { id: "fb_2_1", q: "과일을 모두 세어볼까요?", visual: { type: 'emoji', count: 7, item: '🍊' }, options: ["6", "7", "8"], ans: "7", hint: "손가락으로 짚어가며 7까지 세어봐요!" },
+    { id: "fb_2_2", q: "규칙을 보고 빈칸에 들어갈 과일을 골라보세요. 바나나, 사과, 바나나, 사과, 다음은 무엇일까요?", visual: { type: 'pattern', items: ['🍌', '🍎', '🍌', '🍎', '?'] }, options: ["🍌", "🍎", "🍉"], ans: "🍌", hint: "바나나 다음엔 사과, 사과 다음엔 바나나예요." }
   ],
   3: [ // Stage 3 레벨 (만 5세)
-    { q: "수 가르기! 6은 2와 몇으로 나눌 수 있을까요?", visual: { type: 'math', formula: "6 = 2 + ?" }, options: ["3", "4", "5"], ans: "4", hint: "사과 6개 중 2개를 주면 몇 개가 남을까요?" },
-    { q: "시계가 가리키는 시각은 몇 시일까요?", visual: { type: 'clock', hour: 3, minute: 0 }, options: ["3", "6", "12"], ans: "3", hint: "짧은 바늘이 3, 긴 바늘이 12를 가리켜요." }
+    { id: "fb_3_1", q: "수 가르기! 6은 2와 몇으로 나눌 수 있을까요?", visual: { type: 'math', formula: "6 = 2 + ?" }, options: ["3", "4", "5"], ans: "4", hint: "사과 6개 중 2개를 주면 몇 개가 남을까요?" },
+    { id: "fb_3_2", q: "시계가 가리키는 시각은 몇 시일까요?", visual: { type: 'clock', hour: 3, minute: 0 }, options: ["3", "6", "12"], ans: "3", hint: "짧은 바늘이 3, 긴 바늘이 12를 가리켜요." }
   ],
   4: [ // Stage 4 레벨 (초등 1학년)
-    { q: "더하기 계산을 해보세요. 7 + 5는 무엇일까요?", visual: { type: 'math', formula: "7 + 5 = ?" }, options: ["11", "12", "13"], ans: "12", hint: "7에 3을 더하면 10이고, 2가 남아요." },
-    { q: "더 큰 숫자를 골라볼까요?", visual: { type: 'math', formula: "45 vs 52" }, options: ["45", "52", "같아요"], ans: "52", hint: "십의 자리 숫자를 비교해 보아요. 5가 4보다 커요!" }
+    { id: "fb_4_1", q: "더하기 계산을 해보세요. 7 + 5는 무엇일까요?", visual: { type: 'math', formula: "7 + 5 = ?" }, options: ["11", "12", "13"], ans: "12", hint: "7에 3을 더하면 10이고, 2가 남아요." },
+    { id: "fb_4_2", q: "더 큰 숫자를 골라볼까요?", visual: { type: 'math', formula: "45 vs 52" }, options: ["45", "52", "같아요"], ans: "52", hint: "십의 자리 숫자를 비교해 보아요. 5가 4보다 커요!" }
   ],
   5: [ // Stage 5 레벨 (초등 2~3학년)
-    { q: "곱셈 구구를 해볼까요? 6 × 7 은 얼마일까요?", visual: { type: 'math', formula: "6 × 7 = ?" }, options: ["42", "45", "48"], ans: "42", hint: "여섯 개씩 일곱 묶음이에요. 육칠십이!" },
-    { q: "세 자리 수의 십의 자리 숫자는 무엇일까요? [ 482 ]", visual: { type: 'math', formula: "4 8 2" }, options: ["4", "8", "2"], ans: "8", hint: "백의 자리는 4, 십의 자리는 8, 일의 자리는 2예요." }
+    { id: "fb_5_1", q: "곱셈 구구를 해볼까요? 6 × 7 은 얼마일까요?", visual: { type: 'math', formula: "6 × 7 = ?" }, options: ["42", "45", "48"], ans: "42", hint: "여섯 개씩 일곱 묶음이에요. 육칠십이!" },
+    { id: "fb_5_2", q: "세 자리 수의 십의 자리 숫자는 무엇일까요? [ 482 ]", visual: { type: 'math', formula: "4 8 2" }, options: ["4", "8", "2"], ans: "8", hint: "백의 자리는 4, 십의 자리는 8, 일의 자리는 2예요." }
   ]
 };
 
@@ -358,12 +387,12 @@ function loadTestQuestion() {
   renderVisualArea('test-visual-area', currentTestQuestion.visual);
   
   // TTS 즉시 읽기
-  speakText(currentTestQuestion.questionText || currentTestQuestion.q);
+  speakText(currentTestQuestion.questionText || currentTestQuestion.q, currentTestQuestion.id);
   
   // 오디오 리스너 연결
   document.getElementById('test-tts-btn').onclick = () => {
     playClick();
-    speakText(currentTestQuestion.questionText || currentTestQuestion.q);
+    speakText(currentTestQuestion.questionText || currentTestQuestion.q, currentTestQuestion.id);
   };
   
   // 보기 렌더링
@@ -688,10 +717,10 @@ function loadLearningQuestion() {
   renderVisualArea('learn-visual-area', currentQ.visual);
   
   // TTS 낭독 바인딩
-  speakText(currentQ.questionText);
+  speakText(currentQ.questionText, currentQ.id);
   document.getElementById('learn-tts-btn').onclick = () => {
     playClick();
-    speakText(currentQ.questionText);
+    speakText(currentQ.questionText, currentQ.id);
   };
   
   // 보기 버튼 렌더링
@@ -1567,10 +1596,10 @@ function startSingleIncorrectReview(q, listIdx) {
   document.getElementById('learn-question-text').textContent = q.questionText;
   renderVisualArea('learn-visual-area', q.visual);
   
-  speakText(q.questionText);
+  speakText(q.questionText, q.id);
   document.getElementById('learn-tts-btn').onclick = () => {
     playClick();
-    speakText(q.questionText);
+    speakText(q.questionText, q.id);
   };
   
   const optionsDiv = document.getElementById('learn-options');
@@ -1669,10 +1698,10 @@ function loadIncorrectReviewLoop() {
   document.getElementById('learn-question-text').textContent = currentQ.questionText;
   renderVisualArea('learn-visual-area', currentQ.visual);
   
-  speakText(currentQ.questionText);
+  speakText(currentQ.questionText, currentQ.id);
   document.getElementById('learn-tts-btn').onclick = () => {
     playClick();
-    speakText(currentQ.questionText);
+    speakText(currentQ.questionText, currentQ.id);
   };
   
   const optionsDiv = document.getElementById('learn-options');
