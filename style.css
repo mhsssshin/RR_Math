@@ -108,6 +108,57 @@ body {
   border: 8px solid var(--color-white);
 }
 
+/* 모바일 모드일 때 헤더 요소들 줄바꿈 방지 및 압축 레이아웃 */
+#app-container.mode-mobile #app-header {
+  padding: 0 8px;
+}
+
+#app-container.mode-mobile .user-avatar-container {
+  padding: 4px 6px;
+  gap: 4px;
+}
+
+#app-container.mode-mobile #user-title {
+  font-size: 0.72rem;
+  max-width: 68px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#app-container.mode-mobile #user-level-badge {
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+#app-container.mode-mobile .header-right {
+  gap: 4px;
+}
+
+#app-container.mode-mobile .header-btn {
+  padding: 4px 6px;
+  font-size: 0.75rem;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+#app-container.mode-mobile .header-btn-text {
+  display: none !important; /* 모바일 모드 시 "오답노트" 한글 텍스트를 숨기고 📝 아이콘만 표시 */
+}
+
+#app-container.mode-mobile .acorn-counter,
+#app-container.mode-mobile .star-counter {
+  padding: 3px 6px;
+  font-size: 0.8rem;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+#app-container.mode-mobile .audio-btn {
+  font-size: 1rem;
+  padding: 2px;
+}
+
 #app-container.mode-tablet {
   width: 768px;
   height: 980px;
@@ -133,6 +184,48 @@ body {
     max-height: 100vh !important;
     border-radius: 0 !important;
     border: none !important;
+  }
+  
+  /* 실제 모바일 화면을 위한 단축 룰 적용 */
+  #app-header {
+    padding: 0 8px;
+  }
+  .user-avatar-container {
+    padding: 4px 6px;
+    gap: 4px;
+  }
+  #user-title {
+    font-size: 0.72rem;
+    max-width: 68px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #user-level-badge {
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+  .header-right {
+    gap: 4px;
+  }
+  .header-btn {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .header-btn-text {
+    display: none !important;
+  }
+  .acorn-counter, .star-counter {
+    padding: 3px 6px;
+    font-size: 0.8rem;
+    gap: 2px;
+    white-space: nowrap;
+  }
+  .audio-btn {
+    font-size: 1rem;
+    padding: 2px;
   }
 }
 
@@ -284,6 +377,7 @@ button {
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
 
 .header-btn:hover {
@@ -309,6 +403,7 @@ button {
   border-radius: 20px;
   font-family: var(--font-title);
   font-size: 1rem;
+  white-space: nowrap;
 }
 
 .acorn-icon {
