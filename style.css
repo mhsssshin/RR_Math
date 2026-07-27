@@ -1420,6 +1420,32 @@ button {
   overflow: hidden;
 }
 
+/* 상점 활성화 시 상단 캐릭터 뷰어 축소 배치 */
+.shop-active #room-viewer-container {
+  height: 200px !important;
+  min-height: 200px !important;
+  flex-grow: 0 !important;
+  padding: 6px !important;
+}
+
+.shop-active .myroom-display {
+  height: 100% !important;
+}
+
+.shop-active .rorong-room-avatar {
+  transform: scale(0.8);
+  transform-origin: center bottom;
+}
+
+.shop-active .avatar-pedestal {
+  transform: scale(0.8);
+  transform-origin: center top;
+}
+
+.shop-active .decor-furniture-item {
+  font-size: 2.6rem !important; /* 가구 크기도 살짝 조절하여 깔끔하게 보임 */
+}
+
 .room-panel {
   flex-grow: 1;
   display: flex;

@@ -185,6 +185,18 @@ function showScreen(screenId) {
   if (screenId === 'screen-room') {
     renderMyRoom();
     renderShopItems();
+    
+    // 첫 진입 시 '내 방' 탭으로 리셋
+    const tabMyRoom = document.getElementById('tab-myroom');
+    const tabShop = document.getElementById('tab-shop');
+    const screenRoom = document.getElementById('screen-room');
+    if (tabMyRoom && tabShop && screenRoom) {
+      tabMyRoom.classList.add('active');
+      tabShop.classList.remove('active');
+      screenRoom.classList.remove('shop-active');
+      document.getElementById('room-viewer-container').classList.remove('hidden');
+      document.getElementById('room-shop-container').classList.add('hidden');
+    }
   }
 
   if (screenId === 'screen-roadmap') {
@@ -1817,6 +1829,7 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tab-myroom').classList.add('active');
     document.getElementById('tab-shop').classList.remove('active');
     
+    document.getElementById('screen-room').classList.remove('shop-active');
     document.getElementById('room-viewer-container').classList.remove('hidden');
     document.getElementById('room-shop-container').classList.add('hidden');
   };
@@ -1826,8 +1839,9 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tab-shop').classList.add('active');
     document.getElementById('tab-myroom').classList.remove('active');
     
+    document.getElementById('screen-room').classList.add('shop-active');
+    document.getElementById('room-viewer-container').classList.remove('hidden');
     document.getElementById('room-shop-container').classList.remove('hidden');
-    document.getElementById('room-viewer-container').classList.add('hidden');
   };
   
   // 상점 가구/의상 토글 바인딩
