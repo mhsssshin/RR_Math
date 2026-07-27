@@ -858,10 +858,14 @@ function finishLearningSession() {
     userData.completedDays.push(todayDay);
   }
   
-  // 만약 해당 스테이지를 첫 정주행한 경우 다음 스테이지도 언락해줌
+  // 만약 해당 스테이지를 첫 정주행한 경우 다음 스테이지도 언락해줌 및 선택 스테이지 자동 갱신(전진)
   const nextStageNum = currentActiveLearningStage + 1;
-  if (nextStageNum <= 12 && !userData.unlockedStages.includes(nextStageNum)) {
-    userData.unlockedStages.push(nextStageNum);
+  if (nextStageNum <= 12) {
+    if (!userData.unlockedStages.includes(nextStageNum)) {
+      userData.unlockedStages.push(nextStageNum);
+    }
+    // 사용자가 다음 스테이지로 자연스럽게 나아가도록 선택 스테이지를 자동으로 올려줌
+    userData.currentStage = nextStageNum;
   }
   
   saveUserData();
