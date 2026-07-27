@@ -228,17 +228,17 @@ function updateHeaderUI() {
 // 8문항 난이도 기반의 절차적 수능형/적응형 테스트를 위해 문항 생성
 const TEST_QUESTION_TEMPLATES = {
   1: [ // Stage 1 레벨 (만 4세 기초)
-    { q: "과일이 몇 개일까요? 세어보세요.", visual: { type: 'emoji', count: 3, item: '🍎' }, options: ["2개", "3개", "4개"], ans: "3개", hint: "하나, 둘, 셋... 세 개 있어요!" },
-    { q: "크기가 가장 큰 동물을 골라보세요.", visual: { type: 'emoji_sizes', items: [{e:'🐹', s:1.5}, {e:'🐳', s:3.5}, {e:'🐥', s:1.8}] }, options: ["햄스터 🐹", "고래 🐳", "병아리 🐥"], ans: "고래 🐳", hint: "가장 뚱뚱하고 덩치가 큰 친구는 고래예요." },
-    { q: "모양이 다른 꽃은 무엇일까요?", visual: { type: 'emoji_diff', items: ['🌸', '🌸', '🌻', '🌸'] }, options: ["분홍 꽃 🌸", "해바라기 🌻", "장미꽃 🌹"], ans: "해바라기 🌻", hint: "노랗고 커다란 꽃 하나가 달라요." }
+    { q: "과일이 모두 몇 개일까요? 세어보세요.", visual: { type: 'emoji', count: 3, item: '🍎' }, options: ["2", "3", "4"], ans: "3", hint: "하나, 둘, 셋... 세 개 있어요!" },
+    { q: "크기가 가장 큰 동물을 골라보세요.", visual: { type: 'emoji_sizes', items: [{e:'🐹', s:1.5}, {e:'🐳', s:3.5}, {e:'🐥', s:1.8}] }, options: ["🐹", "🐳", "🐥"], ans: "🐳", hint: "가장 뚱뚱하고 덩치가 큰 친구는 고래예요." },
+    { q: "모양이 다른 꽃은 무엇일까요?", visual: { type: 'emoji_diff', items: ['🌸', '🌸', '🌻', '🌸'] }, options: ["🌸", "🌻", "🌹"], ans: "🌻", hint: "노랗고 커다란 꽃 하나가 달라요." }
   ],
   2: [ // Stage 2 레벨 (만 4세 심화)
-    { q: "과일을 모두 세어볼까요?", visual: { type: 'emoji', count: 7, item: '🍊' }, options: ["6개", "7개", "8개"], ans: "7개", hint: "손가락으로 짚어가며 7까지 세어봐요!" },
-    { q: "규칙을 보고 빈칸에 들어갈 과일을 골라보세요. [🍌, 🍎, 🍌, 🍎, ?]", visual: { type: 'pattern', items: ['🍌', '🍎', '🍌', '🍎', '?'] }, options: ["바나나 🍌", "사과 🍎", "수박 🍉"], ans: "바나나 🍌", hint: "바나나 다음엔 사과, 사과 다음엔 바나나예요." }
+    { q: "과일을 모두 세어볼까요?", visual: { type: 'emoji', count: 7, item: '🍊' }, options: ["6", "7", "8"], ans: "7", hint: "손가락으로 짚어가며 7까지 세어봐요!" },
+    { q: "규칙을 보고 빈칸에 들어갈 과일을 골라보세요. 바나나, 사과, 바나나, 사과, 다음은 무엇일까요?", visual: { type: 'pattern', items: ['🍌', '🍎', '🍌', '🍎', '?'] }, options: ["🍌", "🍎", "🍉"], ans: "🍌", hint: "바나나 다음엔 사과, 사과 다음엔 바나나예요." }
   ],
   3: [ // Stage 3 레벨 (만 5세)
-    { q: "수 가르기! 6은 2와 몇으로 나누어 질까요?", visual: { type: 'math', formula: "6 = 2 + ?" }, options: ["3", "4", "5"], ans: "4", hint: "사과 6개 중 2개를 주면 몇 개가 남을까요?" },
-    { q: "시계가 가리키는 시각은 몇 시일까요?", visual: { type: 'clock', hour: 3, minute: 0 }, options: ["3시", "6시", "12시"], ans: "3시", hint: "짧은 바늘이 3, 긴 바늘이 12를 가리켜요." }
+    { q: "수 가르기! 6은 2와 몇으로 나눌 수 있을까요?", visual: { type: 'math', formula: "6 = 2 + ?" }, options: ["3", "4", "5"], ans: "4", hint: "사과 6개 중 2개를 주면 몇 개가 남을까요?" },
+    { q: "시계가 가리키는 시각은 몇 시일까요?", visual: { type: 'clock', hour: 3, minute: 0 }, options: ["3", "6", "12"], ans: "3", hint: "짧은 바늘이 3, 긴 바늘이 12를 가리켜요." }
   ],
   4: [ // Stage 4 레벨 (초등 1학년)
     { q: "더하기 계산을 해보세요. 7 + 5는 무엇일까요?", visual: { type: 'math', formula: "7 + 5 = ?" }, options: ["11", "12", "13"], ans: "12", hint: "7에 3을 더하면 10이고, 2가 남아요." },
@@ -538,23 +538,23 @@ function generateProceduralQuestion(stage, qNum) {
         const fruit = fruits[Math.floor(Math.random() * fruits.length)];
         qText = `${fruit}는 모두 몇 개일까요?`;
         visual = { type: 'emoji', count: randNum, item: fruit };
-        answer = `${randNum}개`;
-        options = [`${randNum - 1}개`, `${randNum}개`, `${randNum + 1}개`];
+        answer = `${randNum}`;
+        options = [`${randNum - 1}`, `${randNum}`, `${randNum + 1}`];
         hint = `하나, 둘, 셋 하며 한 번에 하나씩 짚으며 세어 보아요!`;
       } else if (subType === 1) {
         // 색상/모양 차이
-        qText = "색깔이나 모양이 혼자 다른 과일/꽃은 무엇일까요?";
+        qText = "모양이나 색깔이 혼자 다른 과일은 무엇일까요?";
         visual = { type: 'emoji_diff', items: ['🍎', '🍎', '🍇', '🍎'] };
-        answer = "포도 🍇";
-        options = ["사과 🍎", "포도 🍇", "딸기 🍓"];
-        hint = `빨간 사과들 속에 혼자 보라색인 과일이 하나 있어요.`;
+        answer = "🍇";
+        options = ["🍎", "🍇", "🍓"];
+        hint = `빨간 사과들 속에 혼자 보라색인 포도 🍇 가 있어요.`;
       } else {
         // 크기 비교
-        qText = "가장 덩치가 크고 무거운 동물은 누구일까요?";
+        qText = "가장 덩치가 크고 커다란 동물은 누구일까요?";
         visual = { type: 'emoji_sizes', items: [{e:'🐹', s:1.4}, {e:'🐳', s:3.4}, {e:'🐥', s:1.7}] };
-        answer = "고래 🐳";
-        options = ["생쥐 🐹", "고래 🐳", "병아리 🐥"];
-        hint = `화면에서 가장 뚱뚱하고 덩치가 커다랗게 그려진 친구를 찾아보세요!`;
+        answer = "🐳";
+        options = ["🐹", "🐳", "🐥"];
+        hint = `화면에서 가장 크고 푸른 고래 🐳 를 골라보세요!`;
       }
     } 
     else if (type === 'apply') {
@@ -563,15 +563,15 @@ function generateProceduralQuestion(stage, qNum) {
         const randNum = Math.floor(Math.random() * 3) + 2; // 2 ~ 4
         qText = `다람쥐에게 버섯을 ${randNum}개 나누어 주려고 해요. 버섯 ${randNum}개가 있는 상자를 골라볼까요?`;
         visual = { type: 'emoji', count: randNum, item: '🍄' };
-        answer = `${randNum}개 카드`;
-        options = [`${randNum - 1}개 카드`, `${randNum}개 카드`, `${randNum + 1}개 카드`];
-        hint = `버섯 그림의 숫자가 딱 ${randNum}개인 카드를 짚어보세요.`;
+        answer = "🍄".repeat(randNum);
+        options = ["🍄".repeat(randNum - 1), "🍄".repeat(randNum), "🍄".repeat(randNum + 1)];
+        hint = `버섯 그림의 개수가 딱 ${randNum}개인 상자를 골라보세요.`;
       } else {
         const randNum = Math.floor(Math.random() * 2) + 3; // 3 ~ 4
         qText = `귀여운 토끼에게 당근을 ${randNum}개 먹이려고 해요. 당근이 ${randNum}개 그려진 카드를 골라주세요!`;
         visual = { type: 'emoji', count: randNum, item: '🥕' };
-        answer = `${randNum}개 카드`;
-        options = [`${randNum - 2}개 카드`, `${randNum}개 카드`, `${randNum + 1}개 카드`];
+        answer = "🥕".repeat(randNum);
+        options = ["🥕".repeat(randNum - 2), "🥕".repeat(randNum), "🥕".repeat(randNum + 1)];
         hint = `당근을 하나씩 세어 보아 ${randNum}개가 되는 카드를 고르세요.`;
       }
     } 
@@ -604,18 +604,18 @@ function generateProceduralQuestion(stage, qNum) {
         const animal = animals[Math.floor(Math.random() * animals.length)];
         qText = `귀여운 ${animal}는 모두 몇 마리일까요?`;
         visual = { type: 'emoji', count: randNum, item: animal };
-        answer = `${randNum}마리`;
-        options = [`${randNum - 2}마리`, `${randNum - 1}마리`, `${randNum}마리`].sort(); // 정규 3선다
-        hint = `다섯보다 더 큰 수예요! 하나씩 손가락으로 짚으며 세어 봐요.`;
+        answer = `${randNum}`;
+        options = [`${randNum - 2}`, `${randNum - 1}`, `${randNum}`];
+        hint = `다섯보다 더 큰 수예요! 하나씩 짚으며 세어 봐요.`;
       } else {
         // 사물 많고 적음 비교
         const a = Math.floor(Math.random() * 3) + 6; // 6~8
         const b = a - 2;
-        qText = `별이 더 많이 들어있는 쪽은 어느 쪽일까요? [왼쪽: ${a}개 vs 오른쪽: ${b}개]`;
-        visual = { type: 'math', formula: `⭐ ${a}개 vs ⭐ ${b}개` };
-        answer = "왼쪽";
-        options = ["왼쪽", "오른쪽", "개수가 같아요"];
-        hint = `더 큰 수의 별이 그려진 방향(왼쪽)을 선택하세요.`;
+        qText = `빨간 상자 🔴와 파란 상자 🔵 중 어느 상자에 별이 더 많이 들어있을까요?`;
+        visual = { type: 'math', formula: `🔴 ${"⭐".repeat(a)}  |  🔵 ${"⭐".repeat(b)}` };
+        answer = "🔴";
+        options = ["🔴", "🔵"];
+        hint = `더 많은 별이 담겨있는 상자의 색깔(🔴)을 골라보세요.`;
       }
     } 
     else if (type === 'apply') {
@@ -624,18 +624,18 @@ function generateProceduralQuestion(stage, qNum) {
         const total = Math.floor(Math.random() * 4) + 5; // 5~8
         const eat = Math.floor(Math.random() * 3) + 1; // 1~3
         const remain = total - eat;
-        qText = `곰돌이가 쿠키 ${total}개를 구웠는데 그중 ${eat}개를 냠냠 먹었어요. 남은 쿠키는 몇 개일까요?`;
+        qText = `곰돌이가 쿠키 ${total}개를 구웠는데 그중 ${eat}개를 먹었어요. 남은 쿠키는 몇 개일까요?`;
         visual = { type: 'emoji', count: total, item: '🍪' };
-        answer = `${remain}개`;
-        options = [`${remain - 1}개`, `${remain}개`, `${remain + 1}개`];
+        answer = `${remain}`;
+        options = [`${remain - 1}`, `${remain}`, `${remain + 1}`];
         hint = `전체 쿠키 ${total}개 중에서 먹은 ${eat}개만큼 빼 보아요!`;
       } else {
         const a = Math.floor(Math.random() * 3) + 4; // 4~6
         const b = Math.floor(Math.random() * 3) + 2; // 2~4
         qText = `다람쥐가 도토리를 아침에 ${a}개 주웠고 점심에 ${b}개 더 주웠어요. 모두 몇 개일까요?`;
         visual = { type: 'math', formula: `${a}개 + ${b}개 = ?` };
-        answer = `${a + b}개`;
-        options = [`${a + b - 1}개`, `${a + b}개`, `${a + b + 2}개`];
+        answer = `${a + b}`;
+        options = [`${a + b - 1}`, `${a + b}`, `${a + b + 2}`];
         hint = `아침에 주운 개수와 점심에 주운 개수를 합해보세요.`;
       }
     } 
@@ -650,12 +650,12 @@ function generateProceduralQuestion(stage, qNum) {
         options = [pItems[0], pItems[1], '🍇'];
         hint = `당근 다음에 토마토가 2개씩 나오고 있어요!`;
       } else {
-        // 순서 알아보기
-        qText = `왼쪽에서 세 번째에 서 있는 숲속 동물은 누구일까요?`;
-        visual = { type: 'pattern', items: ['🐱', '🐶', '🦊', '🐻', '🐼'] };
-        answer = '여우 🦊';
-        options = ['강아지 🐶', '여우 🦊', '곰돌이 🐻'];
-        hint = `왼쪽 첫 번째 고양이, 두 번째 강아지, 세 번째는 여우예요!`;
+        // 사과 많이 가진 동물 비교
+        qText = `사과 🍎를 가장 많이 가지고 있는 동물 친구는 누구일까요?`;
+        visual = { type: 'math', formula: `🐻 🍎  |  🐰 🍎🍎🍎  |  🐱 🍎🍎` };
+        answer = '🐰';
+        options = ['🐻', '🐰', '🐱'];
+        hint = `동물들이 가진 사과 개수를 비교해보세요. 토끼 🐰가 3개로 가장 많아요.`;
       }
     }
   } 
@@ -681,11 +681,11 @@ function generateProceduralQuestion(stage, qNum) {
         hint = `${total}개 중에서 ${a}개를 빼면 나머지 ?는 몇 개가 될지 생각해 보세요.`;
       } else {
         // 절반 분수 조각
-        qText = `피자 한 판을 친구와 똑같이 둘(2개 조각)로 나눈 절반을 수학으로 무엇이라 부를까요?`;
+        qText = `피자 한 판을 똑같이 둘(2개 조각)로 나눈 절반은 어떻게 생겼을까요?`;
         visual = { type: 'math', formula: "1/2" };
-        answer = "이분의 일 (2분의 1)";
-        options = ["이분의 일 (2분의 1)", "삼분의 일 (3분의 1)", "전체 한 판"];
-        hint = `전체 2개 조각 중에서 내 몫인 1개 조각을 의미해요.`;
+        answer = "🍕";
+        options = ["🍕", "🍕🍕", "🎂"];
+        hint = `전체 2개 조각 중에서 내 몫인 1개 조각(반 판)을 골라보세요.`;
       }
     } 
     else if (type === 'apply') {
@@ -693,19 +693,19 @@ function generateProceduralQuestion(stage, qNum) {
       if (subType === 0) {
         // 정각 시계 읽기
         const hour = Math.floor(Math.random() * 8) + 1; // 1~8시
-        qText = `로롱이는 짧은 바늘이 가리키는 시각에 수학 숲으로 떠나요. 시계가 나타내는 시각은 몇 시일까요?`;
+        qText = `시계가 가리키는 시각은 몇 시일까요?`;
         visual = { type: 'clock', hour: hour, minute: 0 };
-        answer = `${hour}시`;
-        options = [`${hour - 1}시`, `${hour}시`, `${hour + 1}시`];
+        answer = `${hour}`;
+        options = [`${hour - 1}`, `${hour}`, `${hour + 1}`];
         hint = `시계바늘 중 짧은 바늘(검은색)이 가리키는 숫자를 눈여겨보세요!`;
       } else {
         // 30분 시계 읽기
         const hour = Math.floor(Math.random() * 6) + 2; // 2~7시
-        qText = `로롱이가 낮잠에서 깨어나는 시각이에요. 시계가 나타내는 시각은 몇 시 몇 분일까요?`;
+        qText = `시계가 가리키는 시각은 몇 시 몇 분일까요?`;
         visual = { type: 'clock', hour: hour, minute: 30 };
-        answer = `${hour}시 30분`;
-        options = [`${hour}시 30분`, `${hour + 1}시 30분`, `${hour}시 정각`];
-        hint = `짧은 바늘이 ${hour}와 ${hour+1}의 딱 중간에 있고, 긴 바늘이 6을 가리켜요.`;
+        answer = `${hour}:30`;
+        options = [`${hour}:30`, `${hour + 1}:30`, `${hour}:00`];
+        hint = `짧은 바늘이 ${hour}와 ${hour+1}의 중간에 있고, 긴 바늘이 6을 가리켜요.`;
       }
     } 
     else if (type === 'think') {
@@ -715,19 +715,19 @@ function generateProceduralQuestion(stage, qNum) {
         const a = Math.floor(Math.random() * 3) + 2;
         const total = 10;
         const b = total - a;
-        qText = `다람쥐가 상자 안에 도토리를 채워 10개를 만들고 싶어요. 이미 도토리가 ${a}개 있다면 몇 개가 더 필요할까요?`;
+        qText = `상자 안에 도토리를 채워 10개를 만들고 싶어요. 이미 도토리가 ${a}개 있다면 몇 개가 더 필요할까요?`;
         visual = { type: 'math', formula: `${a} + ? = 10` };
-        answer = `${b}개`;
-        options = [`${b - 1}개`, `${b}개`, `${b + 1}개`];
+        answer = `${b}`;
+        options = [`${b - 1}`, `${b}`, `${b + 1}`];
         hint = `${a}에서 몇 개를 더 보태야 가득 찬 10이 될까요? 10에서 빼보아요.`;
       } else {
         // 마리수 다리 세기 논리
         const birds = Math.floor(Math.random() * 2) + 2; // 2~3마리
         const legs = birds * 2;
-        qText = `나무가지 위에 새가 ${birds}마리 앉아 있습니다. 새 다리의 수는 모두 몇 개일까요?`;
+        qText = `새가 ${birds}마리 앉아 있습니다. 새 다리의 수는 모두 몇 개일까요?`;
         visual = { type: 'emoji', count: birds, item: '🐦' };
-        answer = `${legs}개`;
-        options = [`${legs - 2}개`, `${legs}개`, `${legs + 2}개`];
+        answer = `${legs}`;
+        options = [`${legs - 2}`, `${legs}`, `${legs + 2}`];
         hint = `새 한 마리는 다리가 2개씩 있어요!`;
       }
     }
