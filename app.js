@@ -12,6 +12,7 @@ const DEFAULT_USER_DATA = {
   xpLevel: 1,             // 레벨
   currentStage: 1,        // 진행 중인 스테이지 번호
   unlockedStages: [1],    // 해금된 스테이지 목록
+  stageProgress: {},      // 각 스테이지별 학습 완료 횟수 (stageNum: 0~5)
   inventory: ['skin_base'], // 구매 완료 아이템 목록 (기본 스킨 포함)
   equippedCostume: { skin: 'skin_base' }, // 장착 캐릭터 스킨 { skin: id }
   equippedFurniture: [],  // 배치 가구 목록 (아이디 배열)
@@ -254,6 +255,7 @@ function loadUserData() {
   
   // 구버전 로컬 스토리지 호환성 보강 (널포인터 예방 안전망)
   userData = { ...DEFAULT_USER_DATA, ...userData };
+  if (!userData.stageProgress) userData.stageProgress = {};
   if (!userData.inventory) userData.inventory = ['skin_base'];
   if (!userData.inventory.includes('skin_base')) {
     userData.inventory.push('skin_base');
@@ -596,10 +598,20 @@ function renderRoadmap() {
     const node = document.getElementById(`island-stage-${stageNum}`);
     if (!node) continue;
     const isUnlocked = userData.unlockedStages.includes(stageNum);
+    const progressCount = userData.stageProgress ? (userData.stageProgress[stageNum] || 0) : 0;
     
     if (isUnlocked) {
       node.classList.remove('locked');
-      node.querySelector('.lock-status').textContent = '🔓';
+      
+      if (progressCount >= 5) {
+        node.querySelector('.lock-status').innerHTML = '<span class="stage-completed-badge" style="color: #2ECC71; font-weight: bold; font-size: 0.95rem;">✅ 완료</span>';
+      } else {
+        let starsStr = '';
+        for (let s = 1; s <= 5; s++) {
+          starsStr += (s <= progressCount) ? '🟡' : '⚪';
+        }
+        node.querySelector('.lock-status').innerHTML = `<span class="stage-progress-stars" style="font-size: 1rem; letter-spacing: 2px;">${starsStr}</span>`;
+      }
       
       // 현재 진행 중인 스테이지인 경우 강조
       if (userData.currentStage === stageNum) {
@@ -617,7 +629,8 @@ function renderRoadmap() {
   // 버튼 라벨 상태 업데이트
   const activeStageNode = document.getElementById(`island-stage-${userData.currentStage}`);
   const stageName = activeStageNode ? activeStageNode.querySelector('.stage-title').textContent : `Stage ${userData.currentStage}`;
-  document.getElementById('btn-start-learn').querySelector('span').textContent = `[${stageName}] 학습하기 (5문제)`;
+  const currentProgress = userData.stageProgress ? (userData.stageProgress[userData.currentStage] || 0) : 0;
+  document.getElementById('btn-start-learn').querySelector('span').textContent = `[${stageName}] 학습하기 (${currentProgress}/5 완료)`;
 
   // 활성화된 카드를 중앙으로 가로 스크롤
   setTimeout(() => {
@@ -858,14 +871,21 @@ function finishLearningSession() {
     userData.completedDays.push(todayDay);
   }
   
-  // 만약 해당 스테이지를 첫 정주행한 경우 다음 스테이지도 언락해줌 및 선택 스테이지 자동 갱신(전진)
+  // 스테이지 진행도 누적 (5세트 × 5문제 = 총 25문제를 풀어야 다음 스테이지 해금)
+  if (!userData.stageProgress) userData.stageProgress = {};
+  const prevProgress = userData.stageProgress[currentActiveLearningStage] || 0;
+  userData.stageProgress[currentActiveLearningStage] = Math.min(prevProgress + 1, 5);
+  const newProgress = userData.stageProgress[currentActiveLearningStage];
+  
+  // 5세트 모두 완료한 경우에만 다음 스테이지 언락 및 자동 전진
   const nextStageNum = currentActiveLearningStage + 1;
-  if (nextStageNum <= 12) {
+  if (newProgress >= 5 && nextStageNum <= 12) {
     if (!userData.unlockedStages.includes(nextStageNum)) {
       userData.unlockedStages.push(nextStageNum);
     }
     // 사용자가 다음 스테이지로 자연스럽게 나아가도록 선택 스테이지를 자동으로 올려줌
     userData.currentStage = nextStageNum;
+    showToast(`🎉 ${currentActiveLearningStage}단계 마스터! 다음 단계가 열렸어요!`);
   }
   
   saveUserData();
@@ -888,6 +908,14 @@ function finishLearningSession() {
   
   // 캘린더 스탬프 렌더링
   renderStampsRow();
+  
+  // 완료 화면 축하 메시지에 진행도 표시
+  const congratsText = document.getElementById('congrats-text');
+  if (newProgress >= 5) {
+    congratsText.textContent = `🎊 축하해요! 이 단계를 완전히 마스터했어요! 다음 단계로 나아가볼까요?`;
+  } else {
+    congratsText.textContent = `와아! 오늘 5문제를 모두 풀었어! 정말 멋지다! (${newProgress}/5세트 완료, ${5 - newProgress}세트 더 하면 다음 단계가 열려요!)`;
+  }
   
   showScreen('screen-completed');
 }
