@@ -12,8 +12,15 @@
 </head>
 <body>
 
+  <!-- 화면 크기 시뮬레이터 선택기 (PC 데스크톱 환경용) -->
+  <div id="device-selector-bar">
+    <span class="selector-title">🖥️ 화면 크기 시뮬레이터:</span>
+    <button id="btn-toggle-mobile" class="device-btn active">📱 스마트폰 모드</button>
+    <button id="btn-toggle-tablet" class="device-btn">📟 태블릿 모드</button>
+  </div>
+
   <!-- 메인 앱 컨테이너 -->
-  <div id="app-container">
+  <div id="app-container" class="mode-mobile">
     
     <!-- 상단 네비게이션 프로필 바 (홈을 제외한 대부분의 화면에서 노출) -->
     <header id="app-header" class="hidden">
