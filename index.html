@@ -464,6 +464,30 @@
                   <div class="avatar-pedestal"></div>
                 </div>
               </div>
+              
+              <!-- 실시간 코스튬 미세조절기 툴바 (드래그 외에 크기/회전 정밀 조절 지원) -->
+              <div id="costume-adjuster-panel" class="adjuster-panel hidden">
+                <div class="adjuster-title">
+                  <span id="adjuster-target-name">🔧 장신구 조절기</span>
+                </div>
+                <div class="adjuster-controls">
+                  <div class="control-group">
+                    <button class="adj-btn btn-move" id="adj-up" title="위로">▲</button>
+                    <div class="control-row">
+                      <button class="adj-btn btn-move" id="adj-left" title="왼쪽으로">◀</button>
+                      <button class="adj-btn btn-reset" id="adj-reset" title="초기화">🔄</button>
+                      <button class="adj-btn btn-move" id="adj-right" title="오른쪽으로">▶</button>
+                    </div>
+                    <button class="adj-btn btn-move" id="adj-down" title="아래로">▼</button>
+                  </div>
+                  <div class="control-group-actions">
+                    <button class="adj-action-btn" id="adj-size-up">➕ 크게</button>
+                    <button class="adj-action-btn" id="adj-size-down">➖ 작게</button>
+                    <button class="adj-action-btn" id="adj-rot-left">↩️ 회전</button>
+                    <button class="adj-action-btn" id="adj-rot-right">↪️ 회전</button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- 2. 상점 및 아이템 장착 아이템 리스트 (두 모드 공유) -->

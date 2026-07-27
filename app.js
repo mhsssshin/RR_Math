@@ -16,7 +16,8 @@ const DEFAULT_USER_DATA = {
   equippedCostume: {},    // 착용 코스튬 { hat: id, glasses: id, clothing: id }
   equippedFurniture: [],  // 배치 가구 목록 (아이디 배열)
   completedDays: [],      // 출석일 기록
-  incorrectAnswers: []    // 오답 리스트
+  incorrectAnswers: [],   // 오답 리스트
+  costumeTransforms: {}   // 각 장신구의 커스텀 위치/크기/각도 상태 { itemId: { x, y, scale, rotate } }
 };
 
 let userData = { ...DEFAULT_USER_DATA };
@@ -158,6 +159,9 @@ function speakText(text) {
 
 // 6. SPA 화면 전환 함수
 function showScreen(screenId) {
+  if (typeof deselectAdjustmentItem === 'function') {
+    deselectAdjustmentItem();
+  }
   document.querySelectorAll('.screen-section').forEach(s => {
     s.classList.add('hidden');
     s.classList.remove('active');
@@ -1239,6 +1243,50 @@ function renderMyRoom() {
   updateCharacterCostumes();
 }
 
+// 코스튬 실시간 미세조정 상태 관리 및 유틸리티
+let activeAdjustmentItemId = null;
+
+function getCostumeTransform(itemId) {
+  if (!userData.costumeTransforms) {
+    userData.costumeTransforms = {};
+  }
+  if (!userData.costumeTransforms[itemId]) {
+    const item = SHOP_ITEMS.find(x => x.id === itemId);
+    userData.costumeTransforms[itemId] = {
+      x: 50,
+      y: item ? (item.style.svgY || 30) : 30,
+      scale: 1.0,
+      rotate: 0
+    };
+  }
+  return userData.costumeTransforms[itemId];
+}
+
+function selectAdjustmentItem(item) {
+  // 모바일/PC 요술방 탭이 열려있을 때만 조절기 활성화
+  const screenRoom = document.getElementById('screen-room');
+  if (screenRoom && screenRoom.classList.contains('shop-active')) {
+    // 상점 모드일 때는 화면이 복잡하므로 미세조절기는 미작동
+    return;
+  }
+  
+  activeAdjustmentItemId = item.id;
+  const panel = document.getElementById('costume-adjuster-panel');
+  const targetName = document.getElementById('adjuster-target-name');
+  if (panel && targetName) {
+    panel.classList.remove('hidden');
+    targetName.textContent = `🔧 ${item.name} 조절기`;
+  }
+}
+
+function deselectAdjustmentItem() {
+  activeAdjustmentItemId = null;
+  const panel = document.getElementById('costume-adjuster-panel');
+  if (panel) {
+    panel.classList.add('hidden');
+  }
+}
+
 function updateCharacterCostumes() {
   const homeGroup = document.getElementById('home-svg-costumes');
   const completedGroup = document.getElementById('completed-svg-costumes');
@@ -1257,19 +1305,83 @@ function updateCharacterCostumes() {
       const item = SHOP_ITEMS.find(x => x.id === itemId);
       if (!item) return;
       
+      const transform = getCostumeTransform(item.id);
+      
       // SVG 텍스트 노드를 만들어 캐릭터 얼굴 좌표계 상에 완벽하게 바인딩
       const textNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      textNode.setAttribute('x', '50');
-      textNode.setAttribute('y', item.style.svgY || '30');
-      textNode.setAttribute('font-size', item.style.svgSize || '30');
+      textNode.setAttribute('x', transform.x.toString());
+      textNode.setAttribute('y', transform.y.toString());
+      
+      // 스케일을 적용한 폰트 크기 계산
+      const baseSize = item.style.svgSize || 30;
+      const scaledSize = baseSize * transform.scale;
+      textNode.setAttribute('font-size', scaledSize.toString());
       textNode.setAttribute('text-anchor', 'middle');
       textNode.setAttribute('dominant-baseline', 'central');
-      textNode.setAttribute('pointer-events', 'none');
       
-      if (item.style.transform) textNode.setAttribute('transform', item.style.transform);
+      // 회전 및 스케일 변환 속성 조합
+      let transformStr = `rotate(${transform.rotate} ${transform.x} ${transform.y})`;
+      if (item.style.transform) {
+        transformStr += ` ${item.style.transform}`;
+      }
+      textNode.setAttribute('transform', transformStr);
+      
       if (item.style.filter) textNode.setAttribute('style', `filter: ${item.style.filter};`);
       
       textNode.textContent = item.emoji;
+      
+      // 드래그 앤 드롭 마우스/터치 바인딩 (마이룸 화면의 SVG에서만 작동 가능)
+      if (group === roomGroup) {
+        textNode.setAttribute('pointer-events', 'auto');
+        textNode.style.cursor = 'move';
+        
+        const startDrag = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          playClick();
+          selectAdjustmentItem(item);
+          
+          const isTouch = e.type === 'touchstart';
+          const startX = isTouch ? e.touches[0].clientX : e.clientX;
+          const startY = isTouch ? e.touches[0].clientY : e.clientY;
+          
+          const initX = transform.x;
+          const initY = transform.y;
+          
+          const svgElement = group.ownerSVGElement;
+          const rect = svgElement.getBoundingClientRect();
+          
+          const onDrag = (moveEvent) => {
+            const moveX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
+            const moveY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
+            
+            // 화면 픽셀 변화를 SVG viewBox 100x100 비율 단위로 맵핑
+            const deltaX = (moveX - startX) * (100 / rect.width);
+            const deltaY = (moveY - startY) * (100 / rect.height);
+            
+            transform.x = initX + deltaX;
+            transform.y = initY + deltaY;
+            
+            updateCharacterCostumes();
+          };
+          
+          const endDrag = () => {
+            document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
+            document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
+            saveUserData();
+          };
+          
+          document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onDrag);
+          document.addEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
+        };
+        
+        textNode.addEventListener('mousedown', startDrag);
+        textNode.addEventListener('touchstart', startDrag, { passive: false });
+      } else {
+        textNode.setAttribute('pointer-events', 'none');
+      }
+      
       group.appendChild(textNode);
     });
   });
@@ -1346,6 +1458,7 @@ function equipItem(item) {
   playClick();
   if (item.category === 'costume') {
     userData.equippedCostume[item.sub] = item.id;
+    selectAdjustmentItem(item);
   } else {
     // 벽지의 경우 중복 안됨
     if (item.sub === 'wallpaper') {
@@ -1366,6 +1479,9 @@ function unequipItem(item) {
   playClick();
   if (item.category === 'costume') {
     delete userData.equippedCostume[item.sub];
+    if (activeAdjustmentItemId === item.id) {
+      deselectAdjustmentItem();
+    }
   } else {
     userData.equippedFurniture = userData.equippedFurniture.filter(id => id !== item.id);
   }
@@ -1872,6 +1988,7 @@ window.addEventListener('DOMContentLoaded', () => {
   
   document.getElementById('tab-shop').onclick = () => {
     playClick();
+    deselectAdjustmentItem();
     document.getElementById('tab-shop').classList.add('active');
     document.getElementById('tab-myroom').classList.remove('active');
     
@@ -1895,6 +2012,39 @@ window.addEventListener('DOMContentLoaded', () => {
     playClick();
     showScreen('screen-roadmap');
   };
+
+  // 실시간 코스튬 미세조절기 버튼 이벤트 바인딩
+  const bindAdjusterButton = (btnId, action) => {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.onclick = () => {
+        if (!activeAdjustmentItemId) return;
+        const transform = getCostumeTransform(activeAdjustmentItemId);
+        action(transform);
+        updateCharacterCostumes();
+        saveUserData();
+        
+        // 버튼 클릭 피드백 틱 효과음
+        playTone(500, 0.03, 'sine');
+      };
+    }
+  };
+
+  bindAdjusterButton('adj-up', (t) => t.y -= 2.5);
+  bindAdjusterButton('adj-down', (t) => t.y += 2.5);
+  bindAdjusterButton('adj-left', (t) => t.x -= 2.5);
+  bindAdjusterButton('adj-right', (t) => t.x += 2.5);
+  bindAdjusterButton('adj-size-up', (t) => t.scale = Math.min(3.0, t.scale + 0.08));
+  bindAdjusterButton('adj-size-down', (t) => t.scale = Math.max(0.3, t.scale - 0.08));
+  bindAdjusterButton('adj-rot-left', (t) => t.rotate = (t.rotate - 15) % 360);
+  bindAdjusterButton('adj-rot-right', (t) => t.rotate = (t.rotate + 15) % 360);
+  bindAdjusterButton('adj-reset', (t) => {
+    const item = SHOP_ITEMS.find(x => x.id === activeAdjustmentItemId);
+    t.x = 50;
+    t.y = item ? (item.style.svgY || 30) : 30;
+    t.scale = 1.0;
+    t.rotate = 0;
+  });
   
   // [오답노트 버튼 바인딩]
   document.getElementById('incorrect-note-btn').onclick = () => {

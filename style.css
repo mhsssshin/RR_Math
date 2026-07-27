@@ -1884,3 +1884,103 @@ button {
   50% { transform: translateY(0) scale(1.15, 0.85); }
   70% { transform: translateY(-6px) scale(1.02, 0.98); }
 }
+
+/* 장신구 조절 툴바 패널 */
+.adjuster-panel {
+  background-color: var(--color-white);
+  border: 2px solid #EAE6DF;
+  border-radius: var(--border-radius-medium);
+  padding: 10px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  animation: popScale 0.25s ease-out forwards;
+}
+
+.adjuster-title {
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  color: var(--color-secondary-dark);
+  text-align: center;
+  border-bottom: 1.5px solid #F1ECE4;
+  padding-bottom: 4px;
+}
+
+.adjuster-controls {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 방향 조절 십자 패드 스타일 */
+.control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.adj-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid #BDC3C7;
+  background-color: var(--color-white);
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--color-text-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.adj-btn:active {
+  background-color: #ECF0F1;
+  transform: scale(0.95);
+}
+
+.adj-btn.btn-reset {
+  background-color: #F8F9FA;
+  border-color: #95A5A6;
+  font-size: 0.8rem;
+}
+
+/* 크기 및 회전 버튼 그룹 */
+.control-group-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  flex-grow: 1;
+}
+
+.adj-action-btn {
+  background-color: #F8F9FA;
+  border: 1.5px solid #CED4DA;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-family: var(--font-title);
+  color: var(--color-text-dark);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.adj-action-btn:active {
+  background-color: #E9ECEF;
+  transform: scale(0.97);
+}
