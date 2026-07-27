@@ -23,18 +23,18 @@ let userData = { ...DEFAULT_USER_DATA };
 
 const SHOP_ITEMS = [
   // 카테고리: costume (모자, 안경, 의상 등)
-  { id: 'hat_straw', category: 'costume', sub: 'hat', name: '밀짚 모자 👒', emoji: '👒', price: 20, style: { top: '-5%', left: '20%', width: '60%', height: '40%', fontSize: '4.2rem', transform: 'rotate(-5deg)' } },
-  { id: 'hat_wizard', category: 'costume', sub: 'hat', name: '마법사 모자 🧙', emoji: '🧙', price: 50, style: { top: '-25%', left: '15%', width: '70%', height: '60%', fontSize: '4.8rem', transform: 'rotate(-10deg)' } },
-  { id: 'hat_crown', category: 'costume', sub: 'hat', name: '황금 왕관 👑', emoji: '👑', price: 70, style: { top: '-15%', left: '22%', width: '56%', height: '40%', fontSize: '3.6rem' } },
-  { id: 'hat_pirate', category: 'costume', sub: 'hat', name: '해적 선장 모자 🏴‍☠️', emoji: '🏴‍☠️', price: 45, style: { top: '-12%', left: '17.5%', width: '65%', height: '42%', fontSize: '4.2rem', transform: 'rotate(-3deg)' } },
-  { id: 'hat_detective', category: 'costume', sub: 'hat', name: '탐정 모자 🕵️', emoji: '🕵️', price: 60, style: { top: '-10%', left: '20%', width: '60%', height: '40%', fontSize: '4.0rem' } },
-  { id: 'glasses_normal', category: 'costume', sub: 'glasses', name: '똘똘이 안경 👓', emoji: '👓', price: 15, style: { top: '22%', left: '22%', width: '56%', height: '24%', fontSize: '3.2rem' } },
-  { id: 'glasses_star', category: 'costume', sub: 'glasses', name: '별 선글라스 🕶️', emoji: '🕶️', price: 40, style: { top: '24%', left: '22%', width: '56%', height: '22%', fontSize: '3.2rem', filter: 'hue-rotate(180deg)' } },
-  { id: 'glasses_funny', category: 'costume', sub: 'glasses', name: '코믹 안경 🥸', emoji: '🥸', price: 30, style: { top: '20%', left: '20%', width: '60%', height: '32%', fontSize: '3.6rem' } },
-  { id: 'bowtie_red', category: 'costume', sub: 'clothing', name: '나비 넥타이 🎀', emoji: '🎀', price: 10, style: { top: '50%', left: '33%', width: '34%', height: '22%', fontSize: '2.2rem' } },
-  { id: 'costume_detective', category: 'costume', sub: 'clothing', name: '탐정 망토 🕵️', emoji: '🧥', price: 80, style: { top: '52%', left: '15%', width: '70%', height: '40%', fontSize: '4.5rem' } },
-  { id: 'costume_cape', category: 'costume', sub: 'clothing', name: '영웅 망토 🦸', emoji: '🦸', price: 75, style: { top: '50%', left: '12%', width: '76%', height: '45%', fontSize: '4.5rem' } },
-  { id: 'costume_scarf', category: 'costume', sub: 'clothing', name: '빨간 목도리 🧣', emoji: '🧣', price: 25, style: { top: '48%', left: '24%', width: '52%', height: '26%', fontSize: '3.2rem' } },
+  { id: 'hat_straw', category: 'costume', sub: 'hat', name: '밀짚 모자 👒', emoji: '👒', price: 20, style: { svgY: 12, svgSize: 42, transform: 'rotate(-5 50 12)' } },
+  { id: 'hat_wizard', category: 'costume', sub: 'hat', name: '마법사 모자 🧙', emoji: '🧙', price: 50, style: { svgY: 4, svgSize: 52, transform: 'rotate(-10 50 4)' } },
+  { id: 'hat_crown', category: 'costume', sub: 'hat', name: '황금 왕관 👑', emoji: '👑', price: 70, style: { svgY: 10, svgSize: 36 } },
+  { id: 'hat_pirate', category: 'costume', sub: 'hat', name: '해적 선장 모자 🏴‍☠️', emoji: '🏴‍☠️', price: 45, style: { svgY: 8, svgSize: 42, transform: 'rotate(-3 50 8)' } },
+  { id: 'hat_detective', category: 'costume', sub: 'hat', name: '탐정 모자 🕵️', emoji: '🕵️', price: 60, style: { svgY: 11, svgSize: 40 } },
+  { id: 'glasses_normal', category: 'costume', sub: 'glasses', name: '똘똘이 안경 👓', emoji: '👓', price: 15, style: { svgY: 33, svgSize: 32 } },
+  { id: 'glasses_star', category: 'costume', sub: 'glasses', name: '별 선글라스 🕶️', emoji: '🕶️', price: 40, style: { svgY: 33, svgSize: 32, filter: 'hue-rotate(180deg)' } },
+  { id: 'glasses_funny', category: 'costume', sub: 'glasses', name: '코믹 안경 🥸', emoji: '🥸', price: 30, style: { svgY: 32, svgSize: 36 } },
+  { id: 'bowtie_red', category: 'costume', sub: 'clothing', name: '나비 넥타이 🎀', emoji: '🎀', price: 10, style: { svgY: 54, svgSize: 24 } },
+  { id: 'costume_detective', category: 'costume', sub: 'clothing', name: '탐정 망토 🕵️', emoji: '🧥', price: 80, style: { svgY: 58, svgSize: 46 } },
+  { id: 'costume_cape', category: 'costume', sub: 'clothing', name: '영웅 망토 🦸', emoji: '🦸', price: 75, style: { svgY: 56, svgSize: 46 } },
+  { id: 'costume_scarf', category: 'costume', sub: 'clothing', name: '빨간 목도리 🧣', emoji: '🧣', price: 25, style: { svgY: 55, svgSize: 32 } },
   
   // 카테고리: furniture (배경 벽지 및 가구)
   { id: 'bg_forest', category: 'furniture', sub: 'wallpaper', name: '초록 숲속 벽지 🌳', emoji: '🌳', price: 30, roomClass: 'room-theme-forest', roomBg: '#D5F5E3' },
@@ -1240,15 +1240,15 @@ function renderMyRoom() {
 }
 
 function updateCharacterCostumes() {
-  const homeLayer = document.getElementById('home-costume-layer');
-  const completedLayer = document.getElementById('completed-costume-layer');
-  const roomLayer = document.getElementById('avatar-costume-layer');
+  const homeGroup = document.getElementById('home-svg-costumes');
+  const completedGroup = document.getElementById('completed-svg-costumes');
+  const roomGroup = document.getElementById('room-svg-costumes');
   
-  const layers = [homeLayer, completedLayer, roomLayer];
+  const groups = [homeGroup, completedGroup, roomGroup];
   
-  layers.forEach(layer => {
-    if (!layer) return;
-    layer.innerHTML = '';
+  groups.forEach(group => {
+    if (!group) return;
+    group.innerHTML = '';
     
     Object.keys(userData.equippedCostume).forEach(slot => {
       const itemId = userData.equippedCostume[slot];
@@ -1257,22 +1257,20 @@ function updateCharacterCostumes() {
       const item = SHOP_ITEMS.find(x => x.id === itemId);
       if (!item) return;
       
-      const el = document.createElement('div');
-      el.className = 'equipped-costume';
-      el.style.position = 'absolute';
-      el.style.left = item.style.left;
-      el.style.top = item.style.top;
-      el.style.width = item.style.width || 'auto';
-      el.style.height = item.style.height || 'auto';
-      el.style.fontSize = item.style.fontSize || '3.5rem';
-      el.style.textAlign = 'center';
-      el.style.pointerEvents = 'none';
+      // SVG 텍스트 노드를 만들어 캐릭터 얼굴 좌표계 상에 완벽하게 바인딩
+      const textNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      textNode.setAttribute('x', '50');
+      textNode.setAttribute('y', item.style.svgY || '30');
+      textNode.setAttribute('font-size', item.style.svgSize || '30');
+      textNode.setAttribute('text-anchor', 'middle');
+      textNode.setAttribute('dominant-baseline', 'central');
+      textNode.setAttribute('pointer-events', 'none');
       
-      if (item.style.transform) el.style.transform = item.style.transform;
-      if (item.style.filter) el.style.filter = item.style.filter;
+      if (item.style.transform) textNode.setAttribute('transform', item.style.transform);
+      if (item.style.filter) textNode.setAttribute('style', `filter: ${item.style.filter};`);
       
-      el.textContent = item.emoji;
-      layer.appendChild(el);
+      textNode.textContent = item.emoji;
+      group.appendChild(textNode);
     });
   });
 }
