@@ -1223,6 +1223,14 @@ function renderMyRoom() {
   roomBg.style.backgroundColor = '#FCF3CF';
   roomBg.className = 'myroom-display';
   
+  // 방 배경 클릭 시 선택 해제
+  roomBg.onclick = (e) => {
+    if (e.target === roomBg) {
+      deselectFurnitureAdjustment();
+      renderMyRoom();
+    }
+  };
+  
   // 장착 가구/벽지 그리기 (미리보기 포함)
   currentPreviewFurniture.forEach(itemId => {
     const item = SHOP_ITEMS.find(x => x.id === itemId);
@@ -1237,22 +1245,41 @@ function renderMyRoom() {
       
       const el = document.createElement('div');
       el.className = 'decor-furniture-item';
+      
+      const isActive = (activeAdjustingFurnitureId === item.id);
+      if (isActive) {
+        el.classList.add('active');
+      }
+      
       el.style.position = 'absolute';
       el.style.left = `${transform.x}%`;
       el.style.top = `${transform.y}%`;
       el.style.transform = `scale(${transform.scale}) rotate(${transform.rotate}deg)`;
       el.style.transformOrigin = 'center center';
-      el.style.cursor = 'move';
-      el.style.userSelect = 'none';
-      el.textContent = item.emoji;
       
-      // 드래그 앤 드롭 바인딩 (인테리어 가구 배치용)
+      el.innerHTML = `
+        <div class="furniture-emoji" style="font-size: 3rem; line-height: 1; padding: 10px; cursor: move;">${item.emoji}</div>
+        <div class="furniture-border-box"></div>
+        <button class="furniture-btn-delete">×</button>
+        <div class="furniture-handle-resize">🔄</div>
+      `;
+      
+      const emojiEl = el.querySelector('.furniture-emoji');
+      const deleteBtn = el.querySelector('.furniture-btn-delete');
+      const resizeHandle = el.querySelector('.furniture-handle-resize');
+      
+      // 1. 드래그 앤 드롭 이동 바인딩 (이모지 부분 드래그 시)
       const startDrag = (e) => {
         e.preventDefault();
         e.stopPropagation();
         
         playClick();
         selectFurnitureAdjustment(item);
+        
+        // 실시간 테두리 활성화를 위해 활성 가구 아이디 갱신
+        if (!isActive) {
+          renderMyRoom();
+        }
         
         const isTouch = e.type === 'touchstart';
         const startX = isTouch ? e.touches[0].clientX : e.clientX;
@@ -1282,7 +1309,6 @@ function renderMyRoom() {
           document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
           saveUserData();
           
-          // 약한 가구 탭 애니메이션 (드래그 종료 시)
           el.classList.add('jump');
           setTimeout(() => el.classList.remove('jump'), 500);
         };
@@ -1291,16 +1317,81 @@ function renderMyRoom() {
         document.addEventListener(isTouch ? 'touchend' : 'mouseup', endDrag);
       };
       
-      el.addEventListener('mousedown', startDrag);
-      el.addEventListener('touchstart', startDrag, { passive: false });
+      emojiEl.addEventListener('mousedown', startDrag);
+      emojiEl.addEventListener('touchstart', startDrag, { passive: false });
       
-      // 일반 클릭 상호작용 (선택만 할 경우 효과음)
-      el.onclick = (e) => {
+      // 2. 가구 클릭 상호작용
+      emojiEl.onclick = (e) => {
         e.stopPropagation();
         playTone(523, 0.08, 'sine');
         setTimeout(() => playTone(784, 0.12, 'sine'), 50);
         selectFurnitureAdjustment(item);
+        renderMyRoom();
       };
+      
+      // 3. 삭제(❌) 버튼 바인딩
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        playClick();
+        unequipItem(item);
+      };
+      
+      // 4. 회전 및 크기 조절 핸들(🔄) 바인딩
+      const handleResize = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const isTouch = e.type === 'touchstart';
+        const startX = isTouch ? e.touches[0].clientX : e.clientX;
+        const startY = isTouch ? e.touches[0].clientY : e.clientY;
+        
+        const parentRect = el.getBoundingClientRect();
+        const centerX = parentRect.left + parentRect.width / 2;
+        const centerY = parentRect.top + parentRect.height / 2;
+        
+        const dx = startX - centerX;
+        const dy = startY - centerY;
+        const initDist = Math.sqrt(dx * dx + dy * dy);
+        const initAngle = Math.atan2(dy, dx);
+        
+        const initScale = transform.scale || 1.0;
+        const initRotate = transform.rotate || 0;
+        
+        const onResizeDrag = (moveEvent) => {
+          const curX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
+          const curY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
+          
+          const curDx = curX - centerX;
+          const curDy = curY - centerY;
+          const curDist = Math.sqrt(curDx * curDx + curDy * curDy);
+          const curAngle = Math.atan2(curDy, curDx);
+          
+          const scaleFactor = curDist / (initDist || 1);
+          let newScale = initScale * scaleFactor;
+          newScale = Math.max(0.4, Math.min(2.5, newScale));
+          
+          const angleDiff = curAngle - initAngle;
+          const newRotate = (initRotate + angleDiff * (180 / Math.PI)) % 360;
+          
+          transform.scale = parseFloat(newScale.toFixed(2));
+          transform.rotate = Math.round(newRotate);
+          
+          el.style.transform = `scale(${transform.scale}) rotate(${transform.rotate}deg)`;
+        };
+        
+        const endResizeDrag = () => {
+          document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onResizeDrag);
+          document.removeEventListener(isTouch ? 'touchend' : 'mouseup', endResizeDrag);
+          saveUserData();
+          renderMyRoom();
+        };
+        
+        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onResizeDrag);
+        document.addEventListener(isTouch ? 'touchend' : 'mouseup', endResizeDrag);
+      };
+      
+      resizeHandle.addEventListener('mousedown', handleResize);
+      resizeHandle.addEventListener('touchstart', handleResize, { passive: false });
       
       decorLayer.appendChild(el);
     }

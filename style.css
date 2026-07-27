@@ -1475,8 +1475,14 @@ button {
 
 .decor-furniture-item {
   position: absolute;
-  font-size: 3.5rem;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+  display: inline-block;
+  user-select: none;
+  z-index: 5;
+}
+
+.decor-furniture-item.active {
+  z-index: 8; /* 선택된 가구 스티커를 최상단 레이어로 올림 */
 }
 
 .decor-wallpaper-pattern {
@@ -1905,17 +1911,90 @@ button {
 
 /* 방 꾸미기 아이템 인터랙션 점프 애니메이션 */
 .decor-furniture-item {
-  cursor: pointer;
   transition: transform 0.1s ease;
-  user-select: none;
-}
-
-.decor-furniture-item:hover {
-  transform: scale(1.15);
 }
 
 .decor-furniture-item.jump {
   animation: itemSqueakJump 0.5s ease-out;
+}
+
+/* 스티커 테두리 점선 상자 */
+.furniture-border-box {
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  border: 2px dashed #E74C3C;
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.decor-furniture-item.active .furniture-border-box {
+  display: block;
+}
+
+/* 삭제 버튼 (X) */
+.furniture-btn-delete {
+  display: none;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background-color: #E74C3C;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 10;
+  padding: 0;
+  line-height: 1;
+}
+
+.decor-furniture-item.active .furniture-btn-delete {
+  display: flex;
+}
+
+.furniture-btn-delete:hover {
+  background-color: #C0392B;
+  transform: scale(1.1);
+}
+
+/* 회전 및 크기 조절 핸들 (🔄) */
+.furniture-handle-resize {
+  display: none;
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background-color: #3498DB;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: nwse-resize;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 10;
+  line-height: 1;
+}
+
+.decor-furniture-item.active .furniture-handle-resize {
+  display: flex;
+}
+
+.furniture-handle-resize:hover {
+  background-color: #2980B9;
+  transform: scale(1.1);
 }
 
 @keyframes itemSqueakJump {
@@ -1925,18 +2004,9 @@ button {
   70% { transform: translateY(-6px) scale(1.02, 0.98); }
 }
 
-/* 장신구 조절 툴바 패널 */
+/* 장신구 조절 툴바 패널 (스티커 형태로 완전 대체되어 숨김) */
 .adjuster-panel {
-  background-color: var(--color-white);
-  border: 2px solid #EAE6DF;
-  border-radius: var(--border-radius-medium);
-  padding: 10px;
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  animation: popScale 0.25s ease-out forwards;
+  display: none !important;
 }
 
 .adjuster-title {
