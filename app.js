@@ -1342,39 +1342,208 @@ function deselectFurnitureAdjustment() {
   }
 }
 
+function getRorongSVG(skinId, isCelebrating = false) {
+  // 1. Cape / Background items (rendered behind Rorong's body)
+  let bgCape = '';
+  if (skinId === 'skin_hero') {
+    // Blue hero cape behind body
+    bgCape = `<path d="M 25 55 C 10 70, 10 90, 30 95 C 50 100, 50 95, 70 95 C 90 90, 90 70, 75 55 Z" fill="#3498DB" />`;
+  } else if (skinId === 'skin_detective') {
+    // Brown detective capelet/coat behind body
+    bgCape = `<path d="M 30 55 L 12 78 Q 50 88 88 78 L 70 55 Z" fill="#D35400" />`;
+  }
+
+  // 2. Base Rorong Body
+  const tail = `<path d="M 80 50 C 95 30, 95 70, 80 80 C 75 85, 65 80, 65 70 Z" fill="#D2691E" />`;
+  const body = `<circle cx="50" cy="55" r="30" fill="#E67E22" />
+                <circle cx="50" cy="58" r="22" fill="#F39C12" />`;
+  const ears = `<polygon points="30,20 40,5 45,22" fill="#D2691E" />
+                <polygon points="30,20 37,9 41,20" fill="#F39C12" />
+                <polygon points="70,20 60,5 55,22" fill="#D2691E" />
+                <polygon points="70,20 63,9 59,20" fill="#F39C12" />`;
+  const face = `<circle cx="50" cy="35" r="24" fill="#E67E22" />
+                <circle cx="50" cy="37" r="18" fill="#F1C40F" />`;
+  
+  // 3. Mask / Eyepatch / Glasses (rendered on the face, under the eyes or over)
+  let faceAccessories = '';
+  if (skinId === 'skin_hero') {
+    // Superhero blue domino mask
+    faceAccessories = `<path d="M 28 30 C 32 25, 45 25, 50 28 C 55 25, 68 25, 72 30 C 76 38, 62 38, 50 33 C 38 38, 24 38, 28 30 Z" fill="#2980B9" />`;
+  } else if (skinId === 'skin_pirate') {
+    // Pirate black eyepatch over left eye
+    faceAccessories = `<path d="M 30 24 L 60 36" stroke="#1C2833" stroke-width="2.5" />
+                       <circle cx="42" cy="30" r="5" fill="#1C2833" />`;
+  } else if (skinId === 'skin_glasses' || skinId === 'skin_sunglasses') {
+    // Smart glasses or sunglasses
+    const frameColor = skinId === 'skin_sunglasses' ? '#2C3E50' : '#E74C3C';
+    const lensFill = skinId === 'skin_sunglasses' ? '#2C3E50' : 'rgba(52, 152, 219, 0.4)';
+    faceAccessories = `
+      <!-- Left frame & lens -->
+      <circle cx="42" cy="30" r="6" stroke="${frameColor}" stroke-width="2" fill="${lensFill}" />
+      <!-- Right frame & lens -->
+      <circle cx="58" cy="30" r="6" stroke="${frameColor}" stroke-width="2" fill="${lensFill}" />
+      <!-- Bridge -->
+      <path d="M 48 30 Q 50 28 52 30" stroke="${frameColor}" stroke-width="2" fill="none" />
+      <!-- Temples -->
+      <path d="M 36 30 Q 30 30 28 32" stroke="${frameColor}" stroke-width="2" fill="none" />
+      <path d="M 64 30 Q 70 30 72 32" stroke="${frameColor}" stroke-width="2" fill="none" />
+    `;
+  } else if (skinId === 'skin_funny') {
+    // Comic disguise (glasses + nose + mustache)
+    faceAccessories = `
+      <circle cx="42" cy="30" r="6" stroke="#000000" stroke-width="2" fill="none" />
+      <circle cx="58" cy="30" r="6" stroke="#000000" stroke-width="2" fill="none" />
+      <path d="M 48 30 Q 50 28 52 30" stroke="#000000" stroke-width="2" fill="none" />
+      <ellipse cx="50" cy="34" rx="4.5" ry="6" fill="#FF8A80" />
+      <!-- Mustache -->
+      <path d="M 45 42 Q 50 38 55 42 Q 60 43 62 40 M 45 42 Q 40 43 38 40" stroke="#000000" stroke-width="2.5" fill="none" />
+    `;
+  }
+
+  // 4. Base Face details (Celebrating vs Normal)
+  let eyes = '';
+  let cheeks = '';
+  let noseMouth = '';
+  
+  if (isCelebrating) {
+    eyes = `
+      <path d="M 38 31 Q 42 27 46 31" stroke="#2C3E50" stroke-width="2.5" stroke-linecap="round" fill="none" />
+      <path d="M 54 31 Q 58 27 62 31" stroke="#2C3E50" stroke-width="2.5" stroke-linecap="round" fill="none" />
+    `;
+    cheeks = `
+      <circle cx="36" cy="36" r="3" fill="#FF7F50" opacity="0.8" />
+      <circle cx="64" cy="36" r="3" fill="#FF7F50" opacity="0.8" />
+    `;
+    noseMouth = `
+      <polygon points="50,33 48,31 52,31" fill="#2C3E50" />
+      <path d="M 44 42 Q 50 49 56 42" fill="#E74C3C" stroke="#2C3E50" stroke-width="1.5" />
+    `;
+  } else {
+    eyes = `
+      <circle cx="42" cy="30" r="3" fill="#2C3E50" />
+      <circle cx="42" cy="29" r="1" fill="#FFFFFF" />
+      <circle cx="58" cy="30" r="3" fill="#2C3E50" />
+      <circle cx="58" cy="29" r="1" fill="#FFFFFF" />
+    `;
+    cheeks = `
+      <circle cx="36" cy="36" r="3" fill="#FF7F50" opacity="0.7" />
+      <circle cx="64" cy="36" r="3" fill="#FF7F50" opacity="0.7" />
+    `;
+    noseMouth = `
+      <polygon points="50,33 48,31 52,31" fill="#2C3E50" />
+      <path d="M 48 35 Q 50 37 52 35" stroke="#2C3E50" stroke-width="1.5" fill="none" />
+      <rect x="48" y="37" width="4" height="3" fill="#FFFFFF" />
+    `;
+  }
+
+  // 5. Neck/Chest Items (rendered on top of body/neck)
+  let neckItem = '';
+  if (skinId === 'skin_scarf') {
+    // Native red scarf wrapped around the neck
+    neckItem = `
+      <!-- Scarf wrap -->
+      <path d="M 32 50 Q 50 63 68 50 Q 72 57 65 62 Q 50 67 35 62 Z" fill="#E74C3C" />
+      <!-- Scarf tail -->
+      <path d="M 58 58 Q 66 75 60 80 Q 54 80 54 75 Q 54 62 58 58 Z" fill="#C0392B" />
+      <!-- Fringes -->
+      <rect x="53" y="79" width="8" height="2" fill="#962D22" />
+    `;
+  } else if (skinId === 'skin_bowtie') {
+    // Red bowtie on neck
+    neckItem = `
+      <polygon points="50,54 40,47 40,61" fill="#E74C3C" />
+      <polygon points="50,54 60,47 60,61" fill="#E74C3C" />
+      <circle cx="50" cy="54" r="3.5" fill="#C0392B" />
+    `;
+  }
+
+  // 6. Hats (rendered on top of Rorong's ears/head)
+  let hatItem = '';
+  if (skinId === 'skin_wizard') {
+    // Purple Wizard Hat with a gold star
+    hatItem = `
+      <g transform="rotate(-6 50 10)">
+        <!-- Brim -->
+        <ellipse cx="50" cy="12" rx="28" ry="5.5" fill="#7D3C98" />
+        <!-- Cone -->
+        <path d="M 28 11 Q 50 -24 50 -24 Q 50 -24 72 11 Z" fill="#8E44AD" />
+        <!-- Gold star -->
+        <polygon points="50,-8 52,-3 57,-3 53,0 55,5 50,2 45,5 47,0 43,-3 48,-3" fill="#F1C40F" />
+      </g>
+    `;
+  } else if (skinId === 'skin_pirate') {
+    // Bicorn Pirate Captain Hat
+    hatItem = `
+      <g transform="rotate(-3 50 12)">
+        <!-- Hat body -->
+        <path d="M 20 18 Q 50 3 80 18 Q 85 8 50 12 Q 15 8 20 18 Z" fill="#2C3E50" />
+        <!-- Gold trim -->
+        <path d="M 20 18 Q 50 3 80 18" fill="none" stroke="#F1C40F" stroke-width="1.5" />
+        <!-- White skull -->
+        <text x="50" y="12" font-size="9" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-family="Arial">💀</text>
+      </g>
+    `;
+  } else if (skinId === 'skin_detective') {
+    // Brown Detective Deerstalker Hat
+    hatItem = `
+      <g transform="translate(0, -1)">
+        <!-- Dome -->
+        <path d="M 28 18 C 28 3, 72 3, 72 18 Z" fill="#D35400" />
+        <!-- Front visor -->
+        <path d="M 22 18 C 22 18, 50 14, 78 18 Q 78 22 50 19 Q 22 22 22 18 Z" fill="#BA4A00" />
+        <!-- Back visor -->
+        <path d="M 26 18 C 26 18, 50 15, 74 18 Q 74 21 50 19 Q 26 21 26 18 Z" fill="#BA4A00" transform="scale(-1, 1) translate(-100, 0)" />
+        <!-- Band -->
+        <rect x="28" y="16" width="44" height="2.5" fill="#E67E22" />
+      </g>
+    `;
+  }
+
+  // Combine everything in correct SVG layer order!
+  return `
+    <svg viewBox="0 0 100 100" class="character-svg" style="overflow: visible;">
+      <!-- 1. 망토 (맨 밑 레이어) -->
+      ${bgCape}
+      
+      <!-- 2. 꼬리 -->
+      ${tail}
+      
+      <!-- 3. 몸체 -->
+      ${body}
+      
+      <!-- 4. 귀 -->
+      ${ears}
+      
+      <!-- 5. 머리/얼굴 원 -->
+      ${face}
+      
+      <!-- 6. 안경/가면 (얼굴 원 위에, 눈 밑에) -->
+      ${faceAccessories}
+      
+      <!-- 7. 눈/볼터치/주둥이 -->
+      ${eyes}
+      ${cheeks}
+      ${noseMouth}
+      
+      <!-- 8. 목도리/넥타이 (몸 위에) -->
+      ${neckItem}
+      
+      <!-- 9. 모자 (맨 위 레이어) -->
+      ${hatItem}
+    </svg>
+  `;
+}
+
 function updateCharacterCostumes() {
-  const homeGroup = document.getElementById('home-svg-costumes');
-  const completedGroup = document.getElementById('completed-svg-costumes');
-  const roomGroup = document.getElementById('room-svg-costumes');
+  const homeTarget = document.getElementById('home-rorong');
+  const completedTarget = document.getElementById('completed-rorong');
+  const roomTarget = document.getElementById('room-rorong-character');
   
-  const groups = [homeGroup, completedGroup, roomGroup];
+  const skinId = userData.equippedCostume.skin || 'skin_base';
   
-  groups.forEach(group => {
-    if (!group) return;
-    group.innerHTML = '';
-    
-    // 장착된 단 하나의 캐릭터 스킨 적용 (구버전 호환성 기본 스킨 처리 포함)
-    const skinId = userData.equippedCostume.skin || 'skin_base';
-    if (skinId === 'skin_base') return;
-    
-    const item = SHOP_ITEMS.find(x => x.id === skinId);
-    if (!item) return;
-    
-    // SVG 텍스트 노드를 만들어 캐릭터 얼굴 좌표계 상에 완벽하게 바인딩
-    const textNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    textNode.setAttribute('x', '50');
-    textNode.setAttribute('y', item.style.svgY || '30');
-    textNode.setAttribute('font-size', item.style.svgSize || '30');
-    textNode.setAttribute('text-anchor', 'middle');
-    textNode.setAttribute('dominant-baseline', 'central');
-    textNode.setAttribute('pointer-events', 'none');
-    
-    if (item.style.transform) textNode.setAttribute('transform', item.style.transform);
-    if (item.style.filter) textNode.setAttribute('style', `filter: ${item.style.filter};`);
-    
-    textNode.textContent = item.emoji;
-    group.appendChild(textNode);
-  });
+  if (homeTarget) homeTarget.innerHTML = getRorongSVG(skinId, false);
+  if (completedTarget) completedTarget.innerHTML = getRorongSVG(skinId, true);
+  if (roomTarget) roomTarget.innerHTML = getRorongSVG(skinId, false);
 }
 
 function renderShopItems() {
