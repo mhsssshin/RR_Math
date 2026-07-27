@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로롱수학 - 신나는 맞춤형 수학 모험!</title>
+  <!-- Google Fonts - 귀여운 'Jua'와 가독성 좋은 'Nanum Gothic' -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 메인 앱 컨테이너 -->
+  <div id="app-container">
+    
+    <!-- 상단 네비게이션 프로필 바 (홈을 제외한 대부분의 화면에서 노출) -->
+    <header id="app-header" class="hidden">
+      <div class="header-left">
+        <div class="user-avatar-container" id="header-avatar-btn">
+          <div class="avatar-circle">
+            <span id="user-avatar-emoji">🐿️</span>
+          </div>
+          <div class="user-info">
+            <span id="user-title">로롱 친구</span>
+            <span id="user-level-badge">Stage 1</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <!-- 오답 노트 버튼 -->
+        <button id="incorrect-note-btn" class="header-btn" title="오답 노트">
+          <span>📝 오답노트</span>
+          <span id="incorrect-badge" class="badge">0</span>
+        </button>
+        <!-- 도토리 개수 표시 -->
+        <div class="acorn-counter" id="header-acorn-counter">
+          <span class="acorn-icon">🌰</span>
+          <span id="user-acorns">20</span>
+        </div>
+        <!-- 오늘 얻은 별 표시 -->
+        <div class="star-counter">
+          <span class="star-icon">⭐</span>
+          <span id="user-stars">0</span>
+        </div>
+        <!-- 볼륨 조절 버튼 -->
+        <button id="audio-toggle-btn" class="audio-btn" title="소리 켜기/끄기">🔊</button>
+      </div>
+    </header>
+
+    <!-- 메인 화면 영역 -->
+    <main id="main-content">
+      
+      <!-- ============================================== -->
+      <!-- [Screen 01] 앱 실행 및 첫 진입 화면 (Home) -->
+      <!-- ============================================== -->
+      <section id="screen-home" class="screen-section active">
+        <div class="home-wrapper">
+          <div class="logo-animation-area">
+            <!-- 숲속 분위기의 장식과 둥둥 떠있는 로롱이 캐릭터 -->
+            <div class="forest-bg-elements">
+              <span class="forest-cloud element-1">☁️</span>
+              <span class="forest-cloud element-2">☁️</span>
+              <span class="forest-flower element-3">🌸</span>
+              <span class="forest-flower element-4">🌻</span>
+            </div>
+            <div class="main-character-wrapper">
+              <div class="rorong-char floating" id="home-rorong">
+                <!-- SVG로 귀여운 캐릭터 그리기 -->
+                <svg viewBox="0 0 100 100" class="character-svg">
+                  <!-- 본체 및 꼬리 -->
+                  <path d="M 80 50 C 95 30, 95 70, 80 80 C 75 85, 65 80, 65 70 Z" fill="#D2691E" />
+                  <!-- 몸체 -->
+                  <circle cx="50" cy="55" r="30" fill="#E67E22" />
+                  <circle cx="50" cy="58" r="22" fill="#F39C12" />
+                  <!-- 얼굴/머리 -->
+                  <circle cx="50" cy="35" r="24" fill="#E67E22" />
+                  <circle cx="50" cy="37" r="18" fill="#F1C40F" />
+                  <!-- 귀 -->
+                  <polygon points="30,20 40,5 45,22" fill="#D2691E" />
+                  <polygon points="30,20 37,9 41,20" fill="#F39C12" />
+                  <polygon points="70,20 60,5 55,22" fill="#D2691E" />
+                  <polygon points="70,20 63,9 59,20" fill="#F39C12" />
+                  <!-- 눈 -->
+                  <circle cx="42" cy="30" r="3" fill="#2C3E50" />
+                  <circle cx="42" cy="29" r="1" fill="#FFFFFF" />
+                  <circle cx="58" cy="30" r="3" fill="#2C3E50" />
+                  <circle cx="58" cy="29" r="1" fill="#FFFFFF" />
+                  <!-- 볼터치 -->
+                  <circle cx="36" cy="36" r="3" fill="#FF7F50" opacity="0.7" />
+                  <circle cx="64" cy="36" r="3" fill="#FF7F50" opacity="0.7" />
+                  <!-- 코와 주둥이 -->
+                  <polygon points="50,33 48,31 52,31" fill="#2C3E50" />
+                  <path d="M 48 35 Q 50 37 52 35" stroke="#2C3E50" stroke-width="1.5" fill="none" />
+                  <!-- 앞니 -->
+                  <rect x="48" y="37" width="4" height="3" fill="#FFFFFF" />
+                </svg>
+              </div>
+            </div>
+            <h1 class="logo-title">로롱수학</h1>
+            <p class="logo-subtitle">숲속 수학 어드벤처로 출동!</p>
+          </div>
+          <div class="home-buttons">
+            <button id="btn-start-test" class="btn-primary bounce-hover">
+              <span class="icon">✏️</span> 처음 시작해요 <small>(레벨테스트)</small>
+            </button>
+            <button id="btn-continue" class="btn-secondary pulse-hover">
+              <span class="icon">🌰</span> 이어서 하기
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- [Screen 02] 유아 맞춤형 레벨테스트 (Test) -->
+      <!-- ============================================== -->
+      <section id="screen-test" class="screen-section hidden">
+        <div class="test-wrapper">
+          <!-- 상단 프로그레스 바 -->
+          <div class="test-header">
+            <div class="progress-container">
+              <div class="progress-bar-bg">
+                <div id="test-progress" class="progress-bar-fill" style="width: 12.5%;"></div>
+              </div>
+              <span id="test-progress-text">1 / 8</span>
+            </div>
+            <button id="test-tts-btn" class="tts-btn bounce-hover">
+              🔊 문제 들려주기
+            </button>
+          </div>
+
+          <!-- 중앙 시각 중심 문제 영역 -->
+          <div class="test-body">
+            <h2 id="test-question-text" class="question-text">사과는 모두 몇 개일까요?</h2>
+            
+            <!-- 문제 시각 자료 (Canvas 또는 SVG 등으로 동적 렌더링) -->
+            <div id="test-visual-area" class="visual-area">
+              <!-- JS에서 여기에 사과, 별, 도형 등의 그래픽을 동적으로 삽입 -->
+            </div>
+          </div>
+
+          <!-- 하단 객관식 보기 카드 -->
+          <div class="test-footer">
+            <div id="test-options" class="options-grid cols-3">
+              <!-- JS에서 보기 카드를 동적으로 렌더링 -->
+              <button class="option-card">1</button>
+              <button class="option-card">2</button>
+              <button class="option-card">3</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- [Screen 03] 메인 학습 맵 (Roadmap) -->
+      <!-- ============================================== -->
+      <section id="screen-roadmap" class="screen-section hidden">
+        <div class="roadmap-wrapper">
+          <div class="roadmap-header-info">
+            <h2>🗺️ 수학 숲속 로드맵</h2>
+            <p>나의 스테이지를 선택하고 도토리를 모으러 가요!</p>
+          </div>
+
+          <!-- 섬 모양의 학습 길 맵 -->
+          <div class="map-container">
+            <div class="island-map">
+              <!-- Stage 1 섬 -->
+              <div class="island-node" id="island-stage-1" data-stage="1">
+                <div class="island-graphic baby-island"></div>
+                <div class="island-label">
+                  <span class="stage-tag">Stage 1</span>
+                  <span class="stage-title">로롱 베이비 🌸</span>
+                  <span class="stage-desc">만 4세 기초 (수 세기, 모양)</span>
+                </div>
+                <div class="lock-status">🔓</div>
+              </div>
+              
+              <!-- 연결 통로 라인들 -->
+              <div class="map-path-line path-1-2"></div>
+
+              <!-- Stage 2 섬 -->
+              <div class="island-node locked" id="island-stage-2" data-stage="2">
+                <div class="island-graphic rabbit-island"></div>
+                <div class="island-label">
+                  <span class="stage-tag">Stage 2</span>
+                  <span class="stage-title">로롱 토끼 🥕</span>
+                  <span class="stage-desc">만 4세 심화 (10까지의 수, 패턴)</span>
+                </div>
+                <div class="lock-status">🔒</div>
+              </div>
+
+              <div class="map-path-line path-2-3"></div>
+
+              <!-- Stage 3 섬 -->
+              <div class="island-node locked" id="island-stage-3" data-stage="3">
+                <div class="island-graphic squirrel-island"></div>
+                <div class="island-label">
+                  <span class="stage-tag">Stage 3</span>
+                  <span class="stage-title">로롱 다람쥐 🐿️</span>
+                  <span class="stage-desc">만 5세 코스 (모으기/가르기, 시계)</span>
+                </div>
+                <div class="lock-status">🔒</div>
+              </div>
+
+              <div class="map-path-line path-3-4"></div>
+
+              <!-- Stage 4 섬 -->
+              <div class="island-node locked" id="island-stage-4" data-stage="4">
+                <div class="island-graphic bear-island"></div>
+                <div class="island-label">
+                  <span class="stage-tag">Stage 4</span>
+                  <span class="stage-title">로롱 곰돌이 🐻</span>
+                  <span class="stage-desc">초등 1학년 (덧셈과 뺄셈)</span>
+                </div>
+                <div class="lock-status">🔒</div>
+              </div>
+
+              <div class="map-path-line path-4-5"></div>
+
+              <!-- Stage 5 섬 -->
+              <div class="island-node locked" id="island-stage-5" data-stage="5">
+                <div class="island-graphic fox-island"></div>
+                <div class="island-label">
+                  <span class="stage-tag">Stage 5</span>
+                  <span class="stage-title">로롱 여우 🦊</span>
+                  <span class="stage-desc">초등 2~3학년 (곱셈구구, 응용)</span>
+                </div>
+                <div class="lock-status">🔒</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 하단 플로팅 컨트롤 (새로운 문제 풀기 활성화 및 내 방 가기) -->
+          <div class="roadmap-footer">
+            <button id="btn-start-learn" class="btn-primary btn-large pulse-animation">
+              ✏️ <span>오늘의 학습 시작하기 (5문제)</span>
+            </button>
+            <button id="btn-generate-new-set" class="btn-accent">
+              🔄 <span>새로운 문제 생성하기 (무한)</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- [Screen 04] 핵심 학습 화면 (Learn - 4+1 구조) -->
+      <!-- ============================================== -->
+      <section id="screen-learn" class="screen-section hidden">
+        <div class="learn-wrapper">
+          <!-- 상단 Q1 ~ Q5 네비게이션 노드 -->
+          <div class="learn-header">
+            <div class="q-nodes-container">
+              <div class="q-node" id="q-node-1" data-q="1">Q1<span class="q-type-tag">개념</span></div>
+              <div class="q-node" id="q-node-2" data-q="2">Q2<span class="q-type-tag">개념</span></div>
+              <div class="q-node" id="q-node-3" data-q="3">Q3<span class="q-type-tag">개념</span></div>
+              <div class="q-node" id="q-node-4" data-q="4">Q4<span class="q-type-tag">응용</span></div>
+              <div class="q-node" id="q-node-5" data-q="5">Q5<span class="q-type-tag">씽크</span></div>
+            </div>
+            <div class="learn-top-actions">
+              <button id="learn-tts-btn" class="tts-btn btn-small">🔊 문제 읽기</button>
+            </div>
+          </div>
+
+          <!-- 중앙 문제 영역 -->
+          <div class="learn-body">
+            <div class="question-type-badge-container">
+              <span id="question-type-badge" class="badge-concept">개념 탄탄 문항</span>
+            </div>
+            <h2 id="learn-question-text" class="question-text">사과 2개와 3개를 모으면 모두 몇 개일까요?</h2>
+            
+            <div id="learn-visual-area" class="visual-area">
+              <!-- 시각 자료 동적 렌더링 -->
+            </div>
+          </div>
+
+          <!-- 하단 보기 답변 영역 -->
+          <div class="learn-footer">
+            <div id="learn-options" class="options-grid cols-3">
+              <!-- 보기 카드가 들어옴 -->
+            </div>
+          </div>
+
+          <!-- 오답 또는 로롱이 힌트 가이드 팝업 (학습 화면 내 삽입) -->
+          <div id="hint-bubble-container" class="hidden">
+            <div class="hint-bubble">
+              <div class="hint-character-avatar">🐿️</div>
+              <div class="hint-content">
+                <p id="hint-message">다시 한번 천천히 세어 볼까? 화이팅!</p>
+                <button id="hint-close-btn">다시 풀어보기 🔄</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- [Screen 05] 학습 완료 및 성장 보상 화면 (Completed) -->
+      <!-- ============================================== -->
+      <section id="screen-completed" class="screen-section hidden">
+        <div class="completed-wrapper">
+          <!-- 폭죽 및 파티클이 터질 캔버스 배경 -->
+          <canvas id="fireworks-canvas"></canvas>
+
+          <div class="completed-content">
+            <div class="celebration-badge animate-bounce">🏆</div>
+            
+            <div class="cheer-character">
+              <div class="rorong-char dancing">
+                <!-- 춤추는 로롱이 캐릭터 SVG -->
+                <svg viewBox="0 0 100 100" class="character-svg">
+                  <path d="M 80 50 C 95 30, 95 70, 80 80 C 75 85, 65 80, 65 70 Z" fill="#D2691E" />
+                  <circle cx="50" cy="55" r="30" fill="#E67E22" />
+                  <circle cx="50" cy="58" r="22" fill="#F39C12" />
+                  <circle cx="50" cy="35" r="24" fill="#E67E22" />
+                  <circle cx="50" cy="37" r="18" fill="#F1C40F" />
+                  <polygon points="30,20 40,5 45,22" fill="#D2691E" />
+                  <polygon points="70,20 60,5 55,22" fill="#D2691E" />
+                  <circle cx="42" cy="30" r="3" fill="#2C3E50" />
+                  <circle cx="58" cy="30" r="3" fill="#2C3E50" />
+                  <circle cx="36" cy="36" r="3" fill="#FF7F50" opacity="0.7" />
+                  <circle cx="64" cy="36" r="3" fill="#FF7F50" opacity="0.7" />
+                  <polygon points="50,33 48,31 52,31" fill="#2C3E50" />
+                  <!-- 웃는 눈/입 -->
+                  <path d="M 40 31 Q 42 27 44 31" stroke="#2C3E50" stroke-width="2" fill="none" />
+                  <path d="M 56 31 Q 58 27 60 31" stroke="#2C3E50" stroke-width="2" fill="none" />
+                  <path d="M 44 42 Q 50 49 56 42" fill="#E74C3C" stroke="#2C3E50" stroke-width="1.5" />
+                </svg>
+              </div>
+            </div>
+
+            <h2 class="congrats-title">참 잘했어요!</h2>
+            <p id="congrats-text" class="congrats-text">와아! 오늘 배운 5문제를 모두 훌륭하게 풀었어! 정말 멋지다!</p>
+            
+            <!-- 보상 내역 카드 -->
+            <div class="reward-box">
+              <h3>🎁 획득한 보상 목록</h3>
+              <div class="rewards-grid">
+                <div class="reward-item">
+                  <span class="reward-icon">🌰</span>
+                  <span class="reward-label">도토리 획득</span>
+                  <strong id="reward-acorns-added" class="reward-val">+15개</strong>
+                </div>
+                <div class="reward-item">
+                  <span class="reward-icon">⭐</span>
+                  <span class="reward-label">오늘의 별 칩</span>
+                  <strong id="reward-stars-added" class="reward-val">+5개</strong>
+                </div>
+                <div class="reward-item">
+                  <span class="reward-icon">🌟</span>
+                  <span class="reward-label">학습 경험치(XP)</span>
+                  <strong id="reward-xp-added" class="reward-val">+100 XP</strong>
+                </div>
+              </div>
+
+              <!-- 레벨업 게이지 바 -->
+              <div class="xp-progress-area">
+                <div class="xp-level-labels">
+                  <span id="current-xp-lv">LV.1</span>
+                  <span id="xp-text">50 / 100 XP</span>
+                  <span id="next-xp-lv">LV.2</span>
+                </div>
+                <div class="xp-bar-bg">
+                  <div id="xp-bar-fill" class="xp-bar-fill" style="width: 50%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 학습 캘린더 스탬프 확인 -->
+            <div class="stamp-calendar-area">
+              <h4>📅 이번 주 연속 학습 스탬프</h4>
+              <div class="calendar-stamps" id="calendar-stamps-row">
+                <div class="stamp-day">월<div class="stamp-slot"></div></div>
+                <div class="stamp-day">화<div class="stamp-slot"></div></div>
+                <div class="stamp-day">수<div class="stamp-slot"></div></div>
+                <div class="stamp-day">목<div class="stamp-slot"></div></div>
+                <div class="stamp-day">금<div class="stamp-slot"></div></div>
+                <div class="stamp-day">토<div class="stamp-slot"></div></div>
+                <div class="stamp-day">일<div class="stamp-slot"></div></div>
+              </div>
+            </div>
+
+            <!-- 이동 제어 버튼 -->
+            <div class="completed-buttons">
+              <button id="btn-go-room" class="btn-primary bounce-hover">
+                🏠 로롱이 방 꾸미기 (상점)
+              </button>
+              <button id="btn-go-roadmap" class="btn-secondary">
+                🗺️ 로드맵으로 돌아가기
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- [Screen 06] 로롱이의 요술 방 꾸미기 (Room/Shop) -->
+      <!-- ============================================== -->
+      <section id="screen-room" class="screen-section hidden">
+        <div class="room-wrapper">
+          
+          <!-- 상단 탭 (방 꾸미기 / 상점) -->
+          <div class="room-header-tabs">
+            <button id="tab-myroom" class="room-tab active">🏠 로롱이의 요술방</button>
+            <button id="tab-shop" class="room-tab">🛒 도토리 코스튬 상점</button>
+          </div>
+
+          <div class="room-content-area">
+            <!-- 1. 내 방 뷰어 (로롱이 방 및 옷 입은 상태 렌더링) -->
+            <div id="room-viewer-container" class="room-panel">
+              <div class="myroom-display" id="myroom-display-bg">
+                <!-- 방 내부 배경 장식들 (가구 배치용) -->
+                <div class="room-decorations-layer" id="room-decorations-layer">
+                  <!-- 장착된 벽지, 인형, 창문, 화분 등이 배치됨 -->
+                </div>
+                
+                <!-- 마이룸 내 캐릭터 디스플레이 (장착된 의상이 오버레이됨) -->
+                <div class="room-character-spot">
+                  <div class="rorong-room-avatar" id="room-rorong-character">
+                    <!-- 기본 로롱이 몸체 SVG -->
+                    <svg viewBox="0 0 100 100" class="character-svg">
+                      <!-- 꼬리 -->
+                      <path d="M 80 50 C 95 30, 95 70, 80 80 C 75 85, 65 80, 65 70 Z" fill="#D2691E" />
+                      <!-- 몸체 -->
+                      <circle cx="50" cy="55" r="30" fill="#E67E22" />
+                      <circle cx="50" cy="58" r="22" fill="#F39C12" />
+                      <!-- 얼굴/머리 -->
+                      <circle cx="50" cy="35" r="24" fill="#E67E22" />
+                      <circle cx="50" cy="37" r="18" fill="#F1C40F" />
+                      <!-- 귀 -->
+                      <polygon points="30,20 40,5 45,22" fill="#D2691E" />
+                      <polygon points="70,20 60,5 55,22" fill="#D2691E" />
+                      <!-- 눈 -->
+                      <circle cx="42" cy="30" r="3" fill="#2C3E50" />
+                      <circle cx="42" cy="29" r="1" fill="#FFFFFF" />
+                      <circle cx="58" cy="30" r="3" fill="#2C3E50" />
+                      <circle cx="58" cy="29" r="1" fill="#FFFFFF" />
+                      <!-- 볼터치 -->
+                      <circle cx="36" cy="36" r="3" fill="#FF7F50" opacity="0.7" />
+                      <circle cx="64" cy="36" r="3" fill="#FF7F50" opacity="0.7" />
+                      <!-- 코/주둥이/치아 -->
+                      <polygon points="50,33 48,31 52,31" fill="#2C3E50" />
+                      <path d="M 48 35 Q 50 37 52 35" stroke="#2C3E50" stroke-width="1.5" fill="none" />
+                      <rect x="48" y="37" width="4" height="3" fill="#FFFFFF" />
+                    </svg>
+                    
+                    <!-- 의상/액세서리 오버레이 레이어 (모자, 안경, 셔츠 등) -->
+                    <div class="avatar-costume-layer" id="avatar-costume-layer">
+                      <!-- JS에서 착용된 의상 SVG/HTML을 동적으로 오버레이 -->
+                    </div>
+                  </div>
+                  <!-- 캐릭터 아래 발판 -->
+                  <div class="avatar-pedestal"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. 상점 및 아이템 장착 아이템 리스트 (두 모드 공유) -->
+            <div id="room-shop-container" class="room-panel">
+              <div class="shop-filter-bar">
+                <button class="shop-filter-btn active" data-category="costume">👑 코스튬</button>
+                <button class="shop-filter-btn" data-category="furniture">🧸 인테리어 가구</button>
+              </div>
+
+              <!-- 아이템 카드 그리드 -->
+              <div class="items-grid" id="shop-items-grid">
+                <!-- JS에서 동적으로 상품 렌더링 -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 하단 돌아가기 버튼 -->
+          <div class="room-footer-actions">
+            <button id="btn-room-back" class="btn-primary">🗺️ 로드맵으로 가기</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ============================================== -->
+    <!-- [오답노트 팝업 모달] -->
+    <!-- ============================================== -->
+    <div id="incorrect-note-modal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>📝 오답 복습 노트</h3>
+          <button id="close-modal-btn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body" id="incorrect-list-container">
+          <!-- 오답 리스트가 없으면 -->
+          <div class="empty-state">
+            <p class="empty-emoji">🎉</p>
+            <p>틀린 문제가 하나도 없어요! 아주 훌륭해요!</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-solve-incorrects" class="btn-primary hidden">오답 전체 다시 풀기 🔄</button>
+          <button id="btn-close-modal" class="btn-secondary">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- [공통 알림 모달 - 커스텀 얼럿] -->
+    <!-- ============================================== -->
+    <div id="alert-toast" class="toast-hidden">도토리 획득! 🌰</div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
