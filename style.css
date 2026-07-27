@@ -782,9 +782,6 @@ button {
   border-bottom-width: 2px;
 }
 
-/* ============================================== */
-/* [Screen 03] 로드맵 화면 */
-/* ============================================== */
 .roadmap-wrapper {
   padding: 20px 16px;
   display: flex;
@@ -812,91 +809,115 @@ button {
   margin-top: 4px;
 }
 
-/* 맵 스크롤 컨테이너 - 가로 스와이프형 지구본 분위기 */
-.map-container {
+/* 지구본 회전 로드맵 (Sphere Walk Cycle) 스타일 */
+.map-container-globe {
   flex-grow: 1;
   background: radial-gradient(circle at 50% 120%, #E8F8F5 0%, #A2D9CE 35%, #2E4053 100%);
   border-radius: var(--border-radius-large);
   border: 3.5px solid #7D9F86;
   position: relative;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   box-shadow: inset 0 4px 16px rgba(0,0,0,0.15);
-  padding: 0 20px;
   margin-bottom: 15px;
   display: flex;
+  justify-content: center;
   align-items: center;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
+  height: 520px;
 }
 
-.island-map {
-  display: flex;
-  flex-direction: row;
-  gap: 50px;
-  align-items: center;
+.globe-wrapper {
   position: relative;
-  min-width: max-content;
-  height: 240px;
-  padding: 0 60px;
+  width: 580px;
+  height: 580px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+  margin-top: 180px; /* 지구본을 밑으로 내려서 아랫쪽 절반이 살짝 가려지게/화면 밑으로 넘어가게 */
 }
 
-/* 맵 경로 연결선 (가로선) */
-.map-path-line {
+.island-map-globe {
+  position: relative;
+  width: 460px;
+  height: 460px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #A2D9CE 0%, #76D7C4 50%, #16A085 100%);
+  border: 8px solid #E8F8F5;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15), inset 0 0 40px rgba(0,0,0,0.1);
+  transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+  transform-origin: center center;
+}
+
+.globe-orbit-dashed {
   position: absolute;
-  top: 50%;
-  left: 60px;
-  right: 60px;
-  height: 6px;
-  background: repeating-linear-gradient(
-    to right,
-    #B2DFDB,
-    #B2DFDB 10px,
-    transparent 10px,
-    transparent 20px
-  );
-  z-index: 1;
-  transform: translateY(-50%);
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  border-radius: 50%;
+  border: 4px dashed #A3E4D7;
+  pointer-events: none;
 }
 
-/* 스테이지 섬 카드 */
+/* 로롱이 지구본 위 걷기 아바타 */
+.rorong-globe-avatar {
+  position: absolute;
+  top: -75px; /* 지구본 위 정중앙 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 85px;
+  height: 85px;
+  z-index: 10;
+  pointer-events: none;
+  transition: transform 0.2s ease-out;
+}
+
+.rorong-globe-avatar.walking {
+  animation: rorongGlobeWalk 0.25s infinite alternate ease-in-out;
+}
+
+@keyframes rorongGlobeWalk {
+  0% {
+    transform: translateX(-50%) translateY(0) rotate(-5deg);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-12px) rotate(5deg);
+  }
+}
+
+/* 개별 스테이지 카드 */
 .island-node {
-  width: 240px;
+  position: absolute;
+  width: 130px;
   background-color: var(--color-white);
   border-radius: var(--border-radius-medium);
   border: 2.5px solid #A2D9CE;
-  padding: 12px;
+  padding: 8px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 4px;
   z-index: 2;
   cursor: pointer;
-  position: relative;
-  border-bottom: 5px solid #85C1E9;
+  border-bottom: 4px solid #85C1E9;
   transition: all 0.25s ease-out;
-  scroll-snap-align: center;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) rotate(var(--angle)) translate(230px) rotate(calc(-1 * var(--angle)));
+  left: 50%;
+  top: 50%;
 }
 
-/* 지구본을 회전하며 따라가는 듯한 물결(파도) 모양 상하 정렬 */
-.island-node:nth-child(odd) {
-  transform: translateY(22px);
-}
-.island-node:nth-child(even) {
-  transform: translateY(-22px);
-}
-
-.island-node:nth-child(odd):hover {
-  transform: translateY(12px) scale(1.05);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.12);
-}
-.island-node:nth-child(even):hover {
-  transform: translateY(-32px) scale(1.05);
+.island-node:hover {
+  transform: translate(-50%, -50%) rotate(var(--angle)) translate(230px) rotate(calc(-1 * var(--angle))) scale(1.1);
   box-shadow: 0 8px 16px rgba(0,0,0,0.12);
 }
 
-.island-node:active {
-  transform: translateY(2px) scale(0.98);
-  border-bottom-width: 2px;
+.island-node.active-stage {
+  border-color: var(--color-primary);
+  border-bottom-color: var(--color-primary-dark);
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
+  transform: translate(-50%, -50%) rotate(var(--angle)) translate(230px) rotate(calc(-1 * var(--angle))) scale(1.18);
+  z-index: 5;
 }
 
 .island-node.locked {

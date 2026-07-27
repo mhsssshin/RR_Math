@@ -584,6 +584,13 @@ function renderRoadmap() {
     }
   }
   
+  // 지구본 회전 각도 설정
+  const globe = document.querySelector('.island-map-globe');
+  if (globe) {
+    const targetRotation = -(userData.currentStage - 1) * 30;
+    globe.style.transform = `rotate(${targetRotation}deg)`;
+  }
+  
   // 버튼 라벨 상태 업데이트
   const activeStageNode = document.getElementById(`island-stage-${userData.currentStage}`);
   const stageName = activeStageNode ? activeStageNode.querySelector('.stage-title').textContent : `Stage ${userData.currentStage}`;
@@ -1310,6 +1317,7 @@ function updateCharacterCostumes() {
   const homeTarget = document.getElementById('home-rorong');
   const completedTarget = document.getElementById('completed-rorong');
   const roomTarget = document.getElementById('room-rorong-character');
+  const roadmapTarget = document.getElementById('roadmap-rorong-character');
   
   const equippedSkinId = userData.equippedCostume.skin || 'skin_base';
   const previewSkinId = currentPreviewSkin || equippedSkinId;
@@ -1317,6 +1325,7 @@ function updateCharacterCostumes() {
   if (homeTarget) homeTarget.innerHTML = getRorongSVG(equippedSkinId, false);
   if (completedTarget) completedTarget.innerHTML = getRorongSVG(equippedSkinId, true);
   if (roomTarget) roomTarget.innerHTML = getRorongSVG(previewSkinId, false);
+  if (roadmapTarget) roadmapTarget.innerHTML = getRorongSVG(equippedSkinId, false);
 }
 
 function renderShopItems() {
@@ -1935,6 +1944,15 @@ window.addEventListener('DOMContentLoaded', () => {
       playClick();
       
       if (userData.unlockedStages.includes(stageNum)) {
+        if (userData.currentStage !== stageNum) {
+          const rorong = document.getElementById('roadmap-rorong-character');
+          if (rorong) {
+            rorong.classList.add('walking');
+            setTimeout(() => {
+              rorong.classList.remove('walking');
+            }, 1200);
+          }
+        }
         userData.currentStage = stageNum;
         saveUserData();
         renderRoadmap();

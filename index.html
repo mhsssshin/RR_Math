@@ -148,142 +148,135 @@
           </div>
 
           <!-- 섬 모양의 학습 길 맵 -->
-          <!-- 섬 모양의 학습 길 맵 (가로 스와이프형) -->
-          <div class="map-container">
-            <div class="island-map">
-              <!-- 연결 통로 라인 (가로선) -->
-              <div class="map-path-line"></div>
-
-              <!-- Stage 1 섬 -->
-              <div class="island-node" id="island-stage-1" data-stage="1">
-                <div class="island-graphic baby-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 1</span>
-                  <span class="stage-title">4세초 🌸</span>
-                  <span class="stage-desc">만 4세 기초 (수 세기, 비교)</span>
+          <!-- 지구본 회전 로드맵 (Sphere Walk Cycle) -->
+          <div class="map-container-globe">
+            <div class="globe-wrapper">
+              <!-- 지구본 맨 위에 위치한 로롱이 캐릭터 -->
+              <div id="roadmap-rorong-character" class="rorong-globe-avatar"></div>
+              
+              <!-- 회전하는 지구본 본체 -->
+              <div class="island-map-globe">
+                <div class="globe-orbit-dashed"></div>
+                
+                <!-- Stage 1 섬 -->
+                <div class="island-node" id="island-stage-1" data-stage="1" style="--angle: -90deg;">
+                  <div class="island-graphic baby-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 1</span>
+                    <span class="stage-title">4세초 🌸</span>
+                  </div>
+                  <div class="lock-status">🔓</div>
                 </div>
-                <div class="lock-status">🔓</div>
-              </div>
 
-              <!-- Stage 2 섬 -->
-              <div class="island-node locked" id="island-stage-2" data-stage="2">
-                <div class="island-graphic rabbit-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 2</span>
-                  <span class="stage-title">4세심 🥕</span>
-                  <span class="stage-desc">만 4세 심화 (10까지 수, 패턴)</span>
+                <!-- Stage 2 섬 -->
+                <div class="island-node locked" id="island-stage-2" data-stage="2" style="--angle: -60deg;">
+                  <div class="island-graphic rabbit-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 2</span>
+                    <span class="stage-title">4세심 🥕</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 3 섬 -->
-              <div class="island-node locked" id="island-stage-3" data-stage="3">
-                <div class="island-graphic squirrel-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 3</span>
-                  <span class="stage-title">5세초 🐿️</span>
-                  <span class="stage-desc">만 5세 기초 (모으기, 가르기)</span>
+                <!-- Stage 3 섬 -->
+                <div class="island-node locked" id="island-stage-3" data-stage="3" style="--angle: -30deg;">
+                  <div class="island-graphic squirrel-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 3</span>
+                    <span class="stage-title">5세초 🐿️</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 4 섬 -->
-              <div class="island-node locked" id="island-stage-4" data-stage="4">
-                <div class="island-graphic bear-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 4</span>
-                  <span class="stage-title">5세심 🐻</span>
-                  <span class="stage-desc">만 5세 심화 (뺄셈, 시계 읽기)</span>
+                <!-- Stage 4 섬 -->
+                <div class="island-node locked" id="island-stage-4" data-stage="4" style="--angle: 0deg;">
+                  <div class="island-graphic bear-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 4</span>
+                    <span class="stage-title">5세심 🐻</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 5 섬 -->
-              <div class="island-node locked" id="island-stage-5" data-stage="5">
-                <div class="island-graphic lion-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 5</span>
-                  <span class="stage-title">6세초 🦁</span>
-                  <span class="stage-desc">만 6세 기초 (10 가르고 더하기)</span>
+                <!-- Stage 5 섬 -->
+                <div class="island-node locked" id="island-stage-5" data-stage="5" style="--angle: 30deg;">
+                  <div class="island-graphic lion-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 5</span>
+                    <span class="stage-title">6세초 🦁</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 6 섬 -->
-              <div class="island-node locked" id="island-stage-6" data-stage="6">
-                <div class="island-graphic fox-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 6</span>
-                  <span class="stage-title">6세심 🦊</span>
-                  <span class="stage-desc">만 6세 심화 (받아내림 뺄셈)</span>
+                <!-- Stage 6 섬 -->
+                <div class="island-node locked" id="island-stage-6" data-stage="6" style="--angle: 60deg;">
+                  <div class="island-graphic fox-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 6</span>
+                    <span class="stage-title">6세심 🦊</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 7 섬 -->
-              <div class="island-node locked" id="island-stage-7" data-stage="7">
-                <div class="island-graphic elephant-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 7</span>
-                  <span class="stage-title">7세초 🐘</span>
-                  <span class="stage-desc">만 7세 기초 (50이내 덧뺄셈)</span>
+                <!-- Stage 7 섬 -->
+                <div class="island-node locked" id="island-stage-7" data-stage="7" style="--angle: 90deg;">
+                  <div class="island-graphic elephant-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 7</span>
+                    <span class="stage-title">7세초 🐘</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 8 섬 -->
-              <div class="island-node locked" id="island-stage-8" data-stage="8">
-                <div class="island-graphic koala-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 8</span>
-                  <span class="stage-title">7세심 🐨</span>
-                  <span class="stage-desc">만 7세 심화 (100이내 덧뺄셈)</span>
+                <!-- Stage 8 섬 -->
+                <div class="island-node locked" id="island-stage-8" data-stage="8" style="--angle: 120deg;">
+                  <div class="island-graphic koala-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 8</span>
+                    <span class="stage-title">7세심 🐨</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 9 섬 -->
-              <div class="island-node locked" id="island-stage-9" data-stage="9">
-                <div class="island-graphic tiger-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 9</span>
-                  <span class="stage-title">8세초 🐯</span>
-                  <span class="stage-desc">만 8세 기초 (곱셈구구 2~5단)</span>
+                <!-- Stage 9 섬 -->
+                <div class="island-node locked" id="island-stage-9" data-stage="9" style="--angle: 150deg;">
+                  <div class="island-graphic tiger-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 9</span>
+                    <span class="stage-title">8세초 🐯</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 10 섬 -->
-              <div class="island-node locked" id="island-stage-10" data-stage="10">
-                <div class="island-graphic dragon-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 10</span>
-                  <span class="stage-title">8세심 🐉</span>
-                  <span class="stage-desc">만 8세 심화 (곱셈구구 6~9단)</span>
+                <!-- Stage 10 섬 -->
+                <div class="island-node locked" id="island-stage-10" data-stage="10" style="--angle: 180deg;">
+                  <div class="island-graphic dragon-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 10</span>
+                    <span class="stage-title">8세심 🐉</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 11 섬 -->
-              <div class="island-node locked" id="island-stage-11" data-stage="11">
-                <div class="island-graphic eagle-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 11</span>
-                  <span class="stage-title">9세초 🦅</span>
-                  <span class="stage-desc">만 9세 기초 (세자리수, 나눗셈)</span>
+                <!-- Stage 11 섬 -->
+                <div class="island-node locked" id="island-stage-11" data-stage="11" style="--angle: 210deg;">
+                  <div class="island-graphic eagle-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 11</span>
+                    <span class="stage-title">9세초 🦅</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
-              </div>
 
-              <!-- Stage 12 섬 -->
-              <div class="island-node locked" id="island-stage-12" data-stage="12">
-                <div class="island-graphic owl-island"></div>
-                <div class="island-label">
-                  <span class="stage-tag">Stage 12</span>
-                  <span class="stage-title">9세심 🦉</span>
-                  <span class="stage-desc">만 9세 심화 (나눗셈 응용, 도형)</span>
+                <!-- Stage 12 섬 -->
+                <div class="island-node locked" id="island-stage-12" data-stage="12" style="--angle: 240deg;">
+                  <div class="island-graphic owl-island"></div>
+                  <div class="island-label-globe">
+                    <span class="stage-tag">Stage 12</span>
+                    <span class="stage-title">9세심 🦉</span>
+                  </div>
+                  <div class="lock-status">🔒</div>
                 </div>
-                <div class="lock-status">🔒</div>
               </div>
             </div>
           </div>
