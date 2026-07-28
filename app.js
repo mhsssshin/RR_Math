@@ -600,6 +600,8 @@ function renderRoadmap() {
     const isUnlocked = userData.unlockedStages.includes(stageNum);
     const progressCount = userData.stageProgress ? (userData.stageProgress[stageNum] || 0) : 0;
     
+    const selectBtn = node.querySelector('.btn-select-stage');
+    
     if (isUnlocked) {
       node.classList.remove('locked');
       
@@ -613,16 +615,41 @@ function renderRoadmap() {
         node.querySelector('.lock-status').innerHTML = `<span class="stage-progress-stars" style="font-size: 1rem; letter-spacing: 2px;">${starsStr}</span>`;
       }
       
-      // 현재 진행 중인 스테이지인 경우 강조
+      // 현재 진행 중인 스테이지인 경우 강조 및 선택하기 버튼 숨김
       if (userData.currentStage === stageNum) {
         node.classList.add('active-stage');
+        if (selectBtn) {
+          selectBtn.style.display = 'none';
+        }
       } else {
         node.classList.remove('active-stage');
+        if (selectBtn) {
+          selectBtn.style.display = 'block';
+          selectBtn.className = 'btn-select-stage btn-secondary';
+          selectBtn.style.backgroundColor = '#E8F8F5';
+          selectBtn.style.border = '1.5px solid #A2D9CE';
+          selectBtn.style.color = '#16A085';
+          selectBtn.textContent = '이동하기';
+          
+          // 드래그 충돌 방지용 클릭 바인딩
+          selectBtn.onpointerdown = (e) => e.stopPropagation();
+          selectBtn.onclick = (e) => {
+            e.stopPropagation();
+            playClick();
+            userData.currentStage = stageNum;
+            saveUserData();
+            renderRoadmap();
+            showToast(`[Stage ${stageNum}] 단계로 이동했습니다!`);
+          };
+        }
       }
     } else {
       node.classList.add('locked');
       node.querySelector('.lock-status').textContent = '🔒';
       node.classList.remove('active-stage');
+      if (selectBtn) {
+        selectBtn.style.display = 'none';
+      }
     }
   }
   
